@@ -2,6 +2,9 @@ import { useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
+import {
+  speak
+} from './conjugation.tsx'
 
 import {
   // Alert,
@@ -15,14 +18,22 @@ import {
   Typography,
   TextField,
   Grid2 as Grid,
-  // ThemeProvider,
-  // createTheme,
 } from '@mui/material'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [currentConjugation, setCurrentConjugation] = useState({
+    mode: "indicatif",
+    temps: "présent",
+    verbe: "savoir",
+    personne: "nous",
+    conjugé: "nous avons su",
+  })
 
-  const temps = [
+  const [personnes, setPersonnes] = useState([])
+  const [temps, setTemps] = useState([])
+  const [verbes, setVerbs] = useState([])
+
+  const allTemps = [
     {mode: "indicatif", temps: "présent"},
     {mode: "indicatif", temps: "passé composé"},
     {mode: "indicatif", temps: "imparfait"},
@@ -44,7 +55,7 @@ function App() {
     {mode: "participe", temps: "passé"},
   ]
 
-  const verbs = [
+  const allVerbs = [
     {group: "Top 100"},
     {group: "1er groupe (-er)"},
     {group: "2e groupe (-ir)"},
@@ -61,7 +72,7 @@ function App() {
     {infinitif: "venir"},
   ]
 
-  const personnes = [
+  const allPersonnes = [
     {personne: 1, plureil: false, pronom: "je"},
     {personne: 2, plureil: false, pronom: "tu"},
     {personne: 3, plureil: false, pronom: "il"},
@@ -82,7 +93,9 @@ function App() {
           <Autocomplete
             multiple
             disableCloseOnSelect
-            options={personnes}
+            options={allPersonnes}
+            value={personnes}
+            onChange={(event, v) => setPersonnes(v)}
             // groupBy={option => `${option.personne}° ${option.plureil ? "plureil" : "singulier"}`}
             getOptionLabel={option => option.pronom}
             renderInput={(params) => <TextField {...params} label="Personnes" />}
@@ -91,7 +104,9 @@ function App() {
           <Autocomplete
             multiple
             disableCloseOnSelect
-            options={temps}
+            options={allTemps}
+            value={temps}
+            onChange={(event, v) => setTemps(v)}
             groupBy={option => option.mode}
             getOptionLabel={option => `${option.temps} (${option.mode})`}
             renderInput={(params) => <TextField {...params} label="Modes et temps" />}
@@ -104,7 +119,9 @@ function App() {
           <Autocomplete
             multiple
             disableCloseOnSelect
-            options={verbs}
+            options={allVerbs}
+            value={verbes}
+            onChange={(event, v) => setVerbs(v)}
             groupBy={option => option.group == undefined ? "individual verbs" : "groups"}
             getOptionLabel={verb => verb.infinitif ?? verb.group}
             renderInput={(params) => <TextField {...params} label="Verbes" />}
@@ -114,7 +131,7 @@ function App() {
           <Button
             variant="contained"
           >
-            Random
+            Choose random
           </Button>
 
           <Grid
@@ -126,9 +143,14 @@ function App() {
             <Button
               fullWidth
               variant="outlined"
+              onClick={() => {
+                let [p, t, v] = [personnes, temps, verbes]
+                // speak(`${p}, ${t}, ${v}`)
+                console.log([p, t, v])
+              }}
             >
               Prononcer
-              
+
               <Switch/>
             </Button>
             </Grid>
@@ -140,7 +162,7 @@ function App() {
               variant="outlined"
             >
               Voir parts
-              
+
               <Switch/>
             </Button>
             </Grid>
@@ -151,7 +173,7 @@ function App() {
               variant="outlined"
             >
               Voir Conjugé
-              
+
               <Switch/>
             </Button>
             </Grid>
