@@ -12,6 +12,8 @@ import {
   VERBES_GROUPE_2,
   VERBES_GROUPE_1,
   PERSONNES,
+  chooseRandom,
+  conjugate,
 } from './conjugation.tsx'
 
 import {
@@ -126,7 +128,19 @@ function App() {
 
           <Button
             variant="contained"
-            onClick={() => console.log(getSampleSpace())}
+            onClick={() => {
+              let parts = chooseRandom(getSampleSpace())
+              let conjugé = conjugate(parts)
+
+              speak(conjugé)
+              setCurrentConjugation({
+                mode: parts.temps.mode,
+                temps: parts.temps.temps,
+                verbe: parts.verbe,
+                personne: parts.personne,
+                conjugé,
+              })
+            }}
           >
             Choose random
           </Button>
@@ -141,9 +155,9 @@ function App() {
               fullWidth
               variant="outlined"
               onClick={() => {
-                let [p, t, v] = [personnes, temps, verbes]
+                let {personnes, temps, verbes} = getSampleSpace()
                 // speak(`${p}, ${t}, ${v}`)
-                console.log([p, t, v])
+                // console.log([p, t, v])
               }}
             >
               Prononcer
@@ -179,21 +193,10 @@ function App() {
 
           </Grid>
 
-          <h3>que + ils + avoir (subjonctif présent)</h3>
-          <h2>qu'ils aient</h2>
+          <h3>{currentConjugation.personne} + {currentConjugation.verbe} ({currentConjugation.mode} {currentConjugation.temps})</h3>
+          <h2>{currentConjugation.conjugé}</h2>
 
         </Stack>
-
-        <p>State</p>
-        <pre>
-        personnes: {JSON.stringify(personnes)}
-        </pre>
-        <pre>
-        temps: {JSON.stringify(temps)}
-        </pre>
-        <pre>
-        verbes: {JSON.stringify(verbes)}
-        </pre>
       </div>
     </>
   )

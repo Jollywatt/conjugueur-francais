@@ -13,19 +13,19 @@ export function speak(text: String) {
 
 export const TEMPS = [
 	{mode: "indicatif",    temps: "présent"},
-	{mode: "indicatif",    temps: "passé_composé"},
+	{mode: "indicatif",    temps: "passé composé"},
 	{mode: "indicatif",    temps: "imparfait"},
-	{mode: "indicatif",    temps: "plus_que_parfait"},
-	{mode: "indicatif",    temps: "futur_simple"},
-	{mode: "indicatif",    temps: "passé_simple"},
-	{mode: "indicatif",    temps: "futur_antérieur"},
-	{mode: "indicatif",    temps: "passé_antérieur"},
+	{mode: "indicatif",    temps: "plus que parfait"},
+	{mode: "indicatif",    temps: "futur simple"},
+	{mode: "indicatif",    temps: "passé simple"},
+	{mode: "indicatif",    temps: "futur antérieur"},
+	{mode: "indicatif",    temps: "passé antérieur"},
 	{mode: "conditionnel", temps: "présent"},
 	{mode: "conditionnel", temps: "passé"},
 	{mode: "subjonctif",   temps: "présent"},
 	{mode: "subjonctif",   temps: "passé"},
 	{mode: "subjonctif",   temps: "imparfait"},
-	{mode: "subjonctif",   temps: "plus_que_parfait"},
+	{mode: "subjonctif",   temps: "plus que parfait"},
 	{mode: "imperatif",    temps: "présent"},
 	{mode: "imperatif",    temps: "passé"},
 	{mode: "participe",    temps: "présent"},
@@ -64,11 +64,18 @@ function randomItem(array) {
 	return array[Math.floor(Math.random()*array.length)]
 }
 
-export function chooseRandom(personnes, temps, verbes) {
-	let personne = randomItem(personnes)
-	let temp = randomItem(temps)
-	let verbe = randomItem(verbes)
+export function chooseRandom({personnes, temps, verbes}) {
+	return {
+		personne: randomItem(personnes),
+		temps: randomItem(temps),
+		verbe: randomItem(verbes),
+	}
+}
 
+export function conjugate({personne, temps, verbe}) {
+	let t = temps.temps.replaceAll(' ', '_')
+	let conj = CONJUGASIONS[verbe]![temps.mode][t][personne]
+	return conj
 }
 
 export const PERSONNES = [
