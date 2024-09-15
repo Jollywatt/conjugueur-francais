@@ -75,7 +75,7 @@ for (let verbe of VERBES) {
 	VERBE_MENU.push({infinitif: verbe})
 }
 
-import CONJUGASIONS from '../public/conjugasions.json'
+import CONJUGASIONS from '/src/conjugasions.json'
 
 export {CONJUGASIONS}
 

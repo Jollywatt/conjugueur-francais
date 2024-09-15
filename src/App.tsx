@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
+import { useHotkeys } from 'react-hotkeys-hook'
+
 import './App.css'
 import {
   speak,
@@ -24,7 +26,10 @@ import {
   Stack,
   TextField,
   Grid2 as Grid,
+  createTheme,
+  ThemeProvider,
 } from '@mui/material'
+import { red, blue } from '@mui/material/colors';
 
 
 function App() {
@@ -107,7 +112,23 @@ function App() {
     if (settings.prononcer) speak(conjugé)
   }
 
+  function partsButton() {
+    setRevealed({...revealed, parts: true})
+  }
+  function conjugéButton() {
+    setRevealed({...revealed, conjugé: true})
+  }
+
   useEffect(() => randomButton(), [])
+
+  useHotkeys('return', randomButton)
+  useHotkeys('space', prononcer)
+  useHotkeys('comma', () => {
+    setRevealed({...revealed, parts: !revealed.parts})
+  })
+  useHotkeys('.', () => {
+    setRevealed({...revealed, conjugé: !revealed.conjugé})
+  })
 
   return (
     <>
@@ -193,7 +214,7 @@ function App() {
               <Button
                 fullWidth
                 variant="outlined"
-                onClick={() => setRevealed({...revealed, parts: true})}
+                onClick={partsButton}
               >
                 Voir parts
               </Button>
@@ -210,9 +231,9 @@ function App() {
               <Button
                 fullWidth
                 variant="outlined"
-                onClick={() => setRevealed({...revealed, conjugé: true})}
+                onClick={conjugéButton}
               >
-                Voir Conjugé
+                Voir conjugé
               </Button>
               <Switch
                 checked={settings.conjugé}
