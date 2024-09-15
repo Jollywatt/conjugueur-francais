@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
@@ -17,22 +17,17 @@ import {
 } from './conjugation.tsx'
 
 import {
-  // Alert,
   Autocomplete,
   Box,
   Button,
   Switch,
-  // FormLabel,
-  // Grow,
   Stack,
-  Typography,
   TextField,
   Grid2 as Grid,
 } from '@mui/material'
 
 
 function App() {
-  window.CONJUGASIONS = CONJUGASIONS
 
   const [currentConjugation, setCurrentConjugation] = useState({
     mode: "indicatif",
@@ -55,9 +50,9 @@ function App() {
 
 
 
-  const [personnes, setPersonnes] = useState([])
-  const [temps, setTemps] = useState([])
-  const [verbes, setVerbs] = useState([])
+  const [personnes, setPersonnes] = useState(PERSONNES)
+  const [temps, setTemps] = useState(TEMPS.slice(0, 3))
+  const [verbes, setVerbs] = useState(VERBE_MENU.slice(0, 1))
 
   function getSelectedVerbes() {
     let all = new Set()
@@ -92,10 +87,40 @@ function App() {
     speak(currentConjugation.conjugé)
   }
 
+  function randomButton() {
+    let parts = chooseRandom(getSampleSpace())
+    let conjugé = conjugate(parts)
+
+    setCurrentConjugation({
+      mode: parts.temps.mode,
+      temps: parts.temps.temps,
+      verbe: parts.verbe,
+      personne: parts.personne,
+      conjugé,
+    })
+
+    setRevealed({
+      parts: settings.parts,
+      conjugé: settings.conjugé,
+    })
+
+    if (settings.prononcer) speak(conjugé)
+  }
+
+  useEffect(() => randomButton(), [])
 
   return (
     <>
-      <h1>Jeu de Conjugasions</h1>
+      <h1>Conjugueur Français</h1>
+{/*
+      <p>
+        Keyboard hotkeys<br/>
+        <key>return</key>: Choisir une exemple
+        <key>space</key>: Prononcer la phrase conjugé
+        <key>comma (,)</key>: Voir les parts
+        <key>point (.)</key>: Voir la phrase conjugé
+      </p>
+*/}
       <div className="card">
 
         <Stack spacing={3}>
@@ -144,62 +169,34 @@ function App() {
 
           <Button
             variant="contained"
-            onClick={() => {
-              let parts = chooseRandom(getSampleSpace())
-              let conjugé = conjugate(parts)
-
-              setCurrentConjugation({
-                mode: parts.temps.mode,
-                temps: parts.temps.temps,
-                verbe: parts.verbe,
-                personne: parts.personne,
-                conjugé,
-              })
-
-              setRevealed({
-                parts: settings.parts,
-                conjugé: settings.conjugé,
-              })
-
-              if (settings.prononcer) speak(conjugé)
-            }}
+            onClick={() => randomButton()}
           >
-            Choose random
+            CHOISIR
           </Button>
 
-          <Grid
-            container
-            spacing={3}
-            // sx={{ flexGrow: 1 }}
-          >
+          <Grid container spacing={3}>
             <Grid size={4}>
-            <Button
-              fullWidth
-              variant="outlined"
-              onClick={() => {
-                prononcer()
-                // setSettings({...settings, prononcer: true})
-              }}
-            >
-              Prononcer
-            </Button>
-
+              <Button
+                fullWidth
+                variant="outlined"
+                onClick={prononcer}
+              >
+                Prononcer
+              </Button>
               <Switch
                 checked={settings.prononcer}
                 onChange={(event, value) => setSettings({...settings, prononcer: value})}
               />
             </Grid>
 
-
             <Grid size={4}>
-            <Button
-              fullWidth
-              variant="outlined"
-              onClick={() => setRevealed({...revealed, parts: true})}
-            >
-              Voir parts
-
-            </Button>
+              <Button
+                fullWidth
+                variant="outlined"
+                onClick={() => setRevealed({...revealed, parts: true})}
+              >
+                Voir parts
+              </Button>
               <Switch
                 checked={settings.parts}
                 onChange={(event, value) => {
@@ -210,14 +207,13 @@ function App() {
             </Grid>
 
             <Grid size={4}>
-            <Button
-              fullWidth
-              variant="outlined"
-              onClick={() => setRevealed({...revealed, conjugé: true})}
-            >
-              Voir Conjugé
-
-            </Button>
+              <Button
+                fullWidth
+                variant="outlined"
+                onClick={() => setRevealed({...revealed, conjugé: true})}
+              >
+                Voir Conjugé
+              </Button>
               <Switch
                 checked={settings.conjugé}
                 onChange={(event, value) => {
@@ -226,15 +222,13 @@ function App() {
                 }}
               />
             </Grid>
-
-
-
           </Grid>
 
           <h3 style={{visibility: revealed.parts ? 'visible' : 'hidden'}}>
           « {currentConjugation.personne.pronom} + {currentConjugation.verbe} »
           au {currentConjugation.temps} ({currentConjugation.mode})</h3>
-          <h2 style={{visibility: revealed.conjugé ? 'visible' : 'hidden'}}>{currentConjugation.conjugé}</h2>
+
+          <h2 id="conjugé" style={{visibility: revealed.conjugé ? 'visible' : 'hidden'}}>{currentConjugation.conjugé}</h2>
 
         </Stack>
       </div>
