@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Component } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import { useHotkeys } from 'react-hotkeys-hook'
@@ -28,9 +28,17 @@ import {
   Grid2 as Grid,
   createTheme,
   ThemeProvider,
+  Popover,
+  Typography,
 } from '@mui/material'
 import { red, blue } from '@mui/material/colors';
 
+
+function Key({ children }) {
+  return (
+    <span class="key">{children}</span>
+  )
+}
 
 function App() {
 
@@ -123,25 +131,74 @@ function App() {
 
   useHotkeys('return', randomButton)
   useHotkeys('space', prononcer)
-  useHotkeys('comma', () => {
+  useHotkeys('comma,p', () => {
     setRevealed({...revealed, parts: !revealed.parts})
   })
-  useHotkeys('.', () => {
+  useHotkeys('.,c', () => {
     setRevealed({...revealed, conjugé: !revealed.conjugé})
   })
+
+  const [anchorEl, setAnchorEl] = useState(null);
+
+  const handleClick = event => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const open = Boolean(anchorEl);
+
+
 
   return (
     <>
       <h1>Conjugueur Français</h1>
-{/*
-      <p>
-        Keyboard hotkeys<br/>
-        <key>return</key>: Choisir une exemple
-        <key>space</key>: Prononcer la phrase conjugé
-        <key>comma (,)</key>: Voir les parts
-        <key>point (.)</key>: Voir la phrase conjugé
-      </p>
-*/}
+
+      <Button onClick={handleClick}>
+        Instructions
+      </Button>
+      <Popover
+        open={open}
+        anchorEl={anchorEl}
+        onClose={handleClose}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'center',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'center',
+        }}
+      >
+        <Typography sx={{ p: 2 }}>
+          <h3>Keyboard shortcuts</h3>
+          <table>
+            <tr>
+              <td><Key>return</Key></td>
+              <td>Choisir une autre exemple</td>
+              <td>Generate random example</td>
+            </tr>
+            <tr>
+              <td><Key>,</Key> ou <Key>p</Key></td>
+              <td>Voir les parts</td>
+              <td>See components</td>
+            </tr>
+            <tr>
+              <td><Key>.</Key> ou <Key>c</Key></td>
+              <td>Voir la phrase conjugé</td>
+              <td>See conjugated phrase</td>
+            </tr>
+            <tr>
+              <td><Key>space</Key></td>
+              <td>Prononcer la phrase conjugé</td>
+              <td>Speak conjugated phrase</td>
+            </tr>
+          </table>
+        </Typography>
+      </Popover>
+
       <div className="card">
 
         <Stack spacing={3}>

@@ -18,3 +18,10 @@ h1 {
 #conjugé {
   font: 35pt 'Snell Roundhand';
 }
+
+.key {
+  font-family: monospace;
+  background: #eee;
+  padding: 0.2em;
+  border-radius: 0.2rem;
+}
