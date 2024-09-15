@@ -1,14 +1,32 @@
 function findVoice(lang: String) {
-	return speechSynthesis.getVoices().filter(v => v.lang == lang)[0]
+	// let voices = speechSynthesis.getVoices().filter(v => v.lang == lang && /Thomas|v.name )
+	let v = voices[Math.floor(Math.random()*voices.length)]
+	console.log(voices, v)
+	return v
 }
 
 export function speak(text: String) {
-	let v = findVoice()
+	// let v = findVoice("fr-FR")
 
 	let u = new SpeechSynthesisUtterance(text)
+	// u.voice = v
 	speechSynthesis.speak(u)
 }
 
+
+export const PERSONNES = [
+	{pronom: "je",    personne: 1, plureil: false, index: 0},
+	{pronom: "tu",    personne: 2, plureil: false, index: 1},
+	// {pronom: "il",    personne: 3, plureil: false, index: 2},
+	// {pronom: "elle",  personne: 3, plureil: false, index: 2},
+	// {pronom: "on",    personne: 3, plureil: false, index: 2},
+	{pronom: "il/elle/on",  personne: 3, plureil: false, index: 2},
+	{pronom: "nous",  personne: 1, plureil: true,  index: 3},
+	{pronom: "vous",  personne: 2, plureil: true,  index: 4},
+	// {pronom: "ils",   personne: 3, plureil: true,  index: 5},
+	// {pronom: "elles", personne: 3, plureil: true,  index: 5},
+	{pronom: "ils/elles", personne: 3, plureil: true,  index: 5},
+]
 
 
 export const TEMPS = [
@@ -26,10 +44,10 @@ export const TEMPS = [
 	{mode: "subjonctif",   temps: "passé"},
 	{mode: "subjonctif",   temps: "imparfait"},
 	{mode: "subjonctif",   temps: "plus que parfait"},
-	{mode: "imperatif",    temps: "présent"},
-	{mode: "imperatif",    temps: "passé"},
-	{mode: "participe",    temps: "présent"},
-	{mode: "participe",    temps: "passé"},
+	// {mode: "imperatif",    temps: "présent"},
+	// {mode: "imperatif",    temps: "passé"},
+	// {mode: "participe",    temps: "présent"},
+	// {mode: "participe",    temps: "passé"},
 ]
 
 // verbs by descending frequency
@@ -74,18 +92,7 @@ export function chooseRandom({personnes, temps, verbes}) {
 
 export function conjugate({personne, temps, verbe}) {
 	let t = temps.temps.replaceAll(' ', '_')
-	let conj = CONJUGASIONS[verbe]![temps.mode][t][personne]
+	let conj = CONJUGASIONS[verbe]![temps.mode][t][personne.index]
 	return conj
 }
 
-export const PERSONNES = [
-	{personne: 1, plureil: false, pronom: "je"},
-	{personne: 2, plureil: false, pronom: "tu"},
-	{personne: 3, plureil: false, pronom: "il"},
-	{personne: 3, plureil: false, pronom: "elle"},
-	{personne: 3, plureil: false, pronom: "on"},
-	{personne: 1, plureil: true,  pronom: "nous"},
-	{personne: 2, plureil: true,  pronom: "vous"},
-	{personne: 3, plureil: true,  pronom: "ils"},
-	{personne: 3, plureil: true,  pronom: "elles"},
-]

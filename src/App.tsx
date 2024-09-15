@@ -32,6 +32,8 @@ import {
 
 
 function App() {
+  window.CONJUGASIONS = CONJUGASIONS
+
   const [currentConjugation, setCurrentConjugation] = useState({
     mode: "indicatif",
     temps: "présent",
@@ -39,6 +41,18 @@ function App() {
     personne: "nous",
     conjugé: "nous avons su",
   })
+
+  const [settings, setSettings] = useState({
+    prononcer: false,
+    parts: true,
+    conjugé: true,
+  })
+
+  const [revealed, setRevealed] = useState({
+    parts: false,
+    conjugé: false
+  })
+
 
 
   const [personnes, setPersonnes] = useState([])
@@ -54,32 +68,34 @@ function App() {
         all = all.union(entry.verbes)
       }
     }
-
-    return Array.from(all)
+    return all.size > 0 ? Array.from(all) : VERBES
   }
 
   function getSelectedPersonnes() {
-    let indices = new Set()
-    for (let p of personnes) {
-      indices.add(p.personne + 3*p.plureil - 1)
-    }
-    return Array.from(indices).sort()
+    return personnes.length > 0 ? personnes : PERSONNES
+  }
+
+  function getSelectedTemps() {
+    return temps.length > 0 ? temps : TEMPS
   }
 
   function getSampleSpace() {
     return {
       personnes: getSelectedPersonnes(),
-      temps: temps,
+      temps: getSelectedTemps(),
       verbes: getSelectedVerbes(),
     }
   }
 
 
+  function prononcer() {
+    speak(currentConjugation.conjugé)
+  }
 
 
   return (
     <>
-      <h1>Conjugation Quizzer</h1>
+      <h1>Jeu de Conjugasions</h1>
       <div className="card">
 
         <Stack spacing={3}>
@@ -132,7 +148,6 @@ function App() {
               let parts = chooseRandom(getSampleSpace())
               let conjugé = conjugate(parts)
 
-              speak(conjugé)
               setCurrentConjugation({
                 mode: parts.temps.mode,
                 temps: parts.temps.temps,
@@ -140,6 +155,13 @@ function App() {
                 personne: parts.personne,
                 conjugé,
               })
+
+              setRevealed({
+                parts: settings.parts,
+                conjugé: settings.conjugé,
+              })
+
+              if (settings.prononcer) speak(conjugé)
             }}
           >
             Choose random
@@ -155,15 +177,17 @@ function App() {
               fullWidth
               variant="outlined"
               onClick={() => {
-                let {personnes, temps, verbes} = getSampleSpace()
-                // speak(`${p}, ${t}, ${v}`)
-                // console.log([p, t, v])
+                prononcer()
+                // setSettings({...settings, prononcer: true})
               }}
             >
               Prononcer
-
-              <Switch/>
             </Button>
+
+              <Switch
+                checked={settings.prononcer}
+                onChange={(event, value) => setSettings({...settings, prononcer: value})}
+              />
             </Grid>
 
 
@@ -171,30 +195,46 @@ function App() {
             <Button
               fullWidth
               variant="outlined"
+              onClick={() => setRevealed({...revealed, parts: true})}
             >
               Voir parts
 
-              <Switch/>
             </Button>
+              <Switch
+                checked={settings.parts}
+                onChange={(event, value) => {
+                  setSettings({...settings, parts: value})
+                  setRevealed({...revealed, parts: value})
+                }}
+              />
             </Grid>
 
             <Grid size={4}>
             <Button
               fullWidth
               variant="outlined"
+              onClick={() => setRevealed({...revealed, conjugé: true})}
             >
               Voir Conjugé
 
-              <Switch/>
             </Button>
+              <Switch
+                checked={settings.conjugé}
+                onChange={(event, value) => {
+                  setSettings({...settings, conjugé: value})
+                  setRevealed({...revealed, conjugé: value})
+                }}
+              />
             </Grid>
 
 
 
           </Grid>
 
-          <h3>{currentConjugation.personne} + {currentConjugation.verbe} ({currentConjugation.mode} {currentConjugation.temps})</h3>
-          <h2>{currentConjugation.conjugé}</h2>
+          <h3 style={{visibility: revealed.parts ? 'visible' : 'hidden'}}>
+          « {currentConjugation.personne.pronom} + {currentConjugation.verbe} »
+          au {currentConjugation.temps} ({currentConjugation.mode})</h3>
+          <h2 style={{visibility: revealed.conjugé ? 'visible' : 'hidden'}}>{currentConjugation.conjugé}</h2>
 
         </Stack>
       </div>
