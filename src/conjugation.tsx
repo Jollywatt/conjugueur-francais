@@ -17,15 +17,15 @@ export function speak(text: String) {
 export const PERSONNES = [
 	{pronom: "je",    personne: 1, plureil: false, index: 0},
 	{pronom: "tu",    personne: 2, plureil: false, index: 1},
-	// {pronom: "il",    personne: 3, plureil: false, index: 2},
-	// {pronom: "elle",  personne: 3, plureil: false, index: 2},
-	// {pronom: "on",    personne: 3, plureil: false, index: 2},
-	{pronom: "il/elle/on",  personne: 3, plureil: false, index: 2},
+	{pronom: "il",    personne: 3, plureil: false, index: 2},
+	{pronom: "elle",  personne: 3, plureil: false, index: 2},
+	{pronom: "on",    personne: 3, plureil: false, index: 2},
+	// {pronom: "il/elle/on",  personne: 3, plureil: false, index: 2},
 	{pronom: "nous",  personne: 1, plureil: true,  index: 3},
 	{pronom: "vous",  personne: 2, plureil: true,  index: 4},
-	// {pronom: "ils",   personne: 3, plureil: true,  index: 5},
-	// {pronom: "elles", personne: 3, plureil: true,  index: 5},
-	{pronom: "ils/elles", personne: 3, plureil: true,  index: 5},
+	{pronom: "ils",   personne: 3, plureil: true,  index: 5},
+	{pronom: "elles", personne: 3, plureil: true,  index: 5},
+	// {pronom: "ils/elles", personne: 3, plureil: true,  index: 5},
 ]
 
 
@@ -94,6 +94,10 @@ export function chooseRandom({personnes, temps, verbes}) {
 export function conjugate({personne, temps, verbe}) {
 	let t = temps.temps.replaceAll(' ', '_')
 	let conj = CONJUGASIONS[verbe]![temps.mode][t][personne.index]
+	if (/^(elle|on)/.test(personne.pronom)) {
+		conj = conj.replace(/ils?/, personne.pronom)
+	}
+
 	return conj
 }
 
