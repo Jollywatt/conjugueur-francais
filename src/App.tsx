@@ -51,7 +51,7 @@ function App() {
     conjugé: true,
   })
 
-  const [voice, setVoice] = useState<string>('')
+  const [voice, setVoice] = useState(null)
   const availableVoices = speechSynthesis.getVoices()
     .map(v => {v.is_fr = v.lang == 'fr-FR'; return v})
     .sort((a, b) => a.is_fr != b.is_fr ? a.is_fr < b.is_fr : a.lang > b.lang )
@@ -94,7 +94,6 @@ function App() {
       verbes: getSelectedVerbes(),
     }
   }
-
 
   function speak(text: String, v) {
     let u = new SpeechSynthesisUtterance(text)
@@ -189,14 +188,15 @@ function App() {
 
             onChange={(event, v) => {
               setVoice(v)
-              speak(v.name, v)
+              if (v != null) speak(v.name, v)
             }}
             getOptionLabel={v => !v ? "Default" : `${v.lang} “${v.name}” ${v.voiceURI}`}
             renderInput={(params) => <TextField {...params} label="Voix" />}
           />
-
+          <p>Laisser vide pour la voix par défaut.</p>
 
           <h4>Keyboard shortcuts</h4>
+
           <table>
             <tbody>
               <tr>
@@ -229,11 +229,11 @@ function App() {
         <Stack spacing={3}>
 
           <Autocomplete
-            multiple
             disableCloseOnSelect
             options={PERSONNES}
             value={personnes}
             onChange={(event, v) => setPersonnes(v)}
+            multiple
             // groupBy={option => `${option.personne}° ${option.plureil ? "plureil" : "singulier"}`}
             getOptionLabel={option => option.pronom}
             renderInput={(params) => <TextField {...params} label="Personnes" />}
@@ -274,7 +274,7 @@ function App() {
             variant="contained"
             onClick={() => randomButton()}
           >
-            CHOISIR
+            Au hasard
           </Button>
 
           <Grid container spacing={3}>
@@ -298,7 +298,7 @@ function App() {
                 variant="outlined"
                 onClick={partsButton}
               >
-                Voir parts
+                Décomposer
               </Button>
               <Switch
                 checked={settings.parts}
@@ -315,7 +315,7 @@ function App() {
                 variant="outlined"
                 onClick={conjugéButton}
               >
-                Voir conjugé
+                Conjuger
               </Button>
               <Switch
                 checked={settings.conjugé}
