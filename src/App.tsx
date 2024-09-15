@@ -1,28 +1,11 @@
-import { useState, useEffect, Component } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import { useHotkeys } from 'react-hotkeys-hook'
-
-import './App.css'
-import {
-  speak,
-  TEMPS,
-  VERBES,
-  VERBE_MENU,
-  CONJUGASIONS,
-  VERBES_GROUPE_3,
-  VERBES_GROUPE_2,
-  VERBES_GROUPE_1,
-  PERSONNES,
-  chooseRandom,
-  conjugate,
-} from './conjugation.tsx'
-
+import { useState, useEffect } from 'react'
 import {
   Autocomplete,
   Box,
   Button,
   Switch,
+  Select,
+  MenuItem,
   Stack,
   TextField,
   Grid2 as Grid,
@@ -30,13 +13,25 @@ import {
   ThemeProvider,
   Popover,
   Typography,
+  Paper,
 } from '@mui/material'
-import { red, blue } from '@mui/material/colors';
+import { useHotkeys } from 'react-hotkeys-hook'
+
+import './App.css'
+
+import {
+  TEMPS,
+  VERBES,
+  VERBE_MENU,
+  PERSONNES,
+  chooseRandom,
+  conjugate,
+} from './conjugation.tsx'
 
 
 function Key({ children }) {
   return (
-    <span class="key">{children}</span>
+    <span className="key">{children}</span>
   )
 }
 
@@ -56,16 +51,21 @@ function App() {
     conjugé: true,
   })
 
+  const [voice, setVoice] = useState<string>('')
+  const availableVoices = speechSynthesis.getVoices()
+    .map(v => {v.is_fr = v.lang == 'fr-FR'; return v})
+    .sort((a, b) => a.is_fr != b.is_fr ? a.is_fr < b.is_fr : a.lang > b.lang )
+
   const [revealed, setRevealed] = useState({
     parts: false,
     conjugé: false
   })
 
 
-
   const [personnes, setPersonnes] = useState(PERSONNES)
   const [temps, setTemps] = useState(TEMPS.slice(0, 3))
   const [verbes, setVerbs] = useState(VERBE_MENU.slice(0, 1))
+
 
   function getSelectedVerbes() {
     let all = new Set()
@@ -93,6 +93,14 @@ function App() {
       temps: getSelectedTemps(),
       verbes: getSelectedVerbes(),
     }
+  }
+
+
+  function speak(text: String, v) {
+    let u = new SpeechSynthesisUtterance(text)
+    u.voice = v ?? voice
+    u.rate = 0.8
+    speechSynthesis.speak(u)
   }
 
 
@@ -150,8 +158,6 @@ function App() {
 
   const open = Boolean(anchorEl);
 
-
-
   return (
     <>
       <h1>Conjugueur Français</h1>
@@ -172,31 +178,50 @@ function App() {
           horizontal: 'center',
         }}
       >
-        <Typography sx={{ p: 2 }}>
-          <h3>Keyboard shortcuts</h3>
+        <Paper sx={{ p: 2 }}>
+
+          <h4>Voix synthétique pour la prononciation:</h4>
+          <Autocomplete
+            label="Voix"
+            value={voice}
+            options={availableVoices}
+            disableCloseOnSelect
+
+            onChange={(event, v) => {
+              setVoice(v)
+              speak(v.name, v)
+            }}
+            getOptionLabel={v => !v ? "Default" : `${v.lang} “${v.name}” ${v.voiceURI}`}
+            renderInput={(params) => <TextField {...params} label="Voix" />}
+          />
+
+
+          <h4>Keyboard shortcuts</h4>
           <table>
-            <tr>
-              <td><Key>return</Key></td>
-              <td>Choisir une autre exemple</td>
-              <td>Generate random example</td>
-            </tr>
-            <tr>
-              <td><Key>,</Key> ou <Key>p</Key></td>
-              <td>Voir les parts</td>
-              <td>See components</td>
-            </tr>
-            <tr>
-              <td><Key>.</Key> ou <Key>c</Key></td>
-              <td>Voir la phrase conjugé</td>
-              <td>See conjugated phrase</td>
-            </tr>
-            <tr>
-              <td><Key>space</Key></td>
-              <td>Prononcer la phrase conjugé</td>
-              <td>Speak conjugated phrase</td>
-            </tr>
+            <tbody>
+              <tr>
+                <td><Key>return</Key></td>
+                <td>Choisir une autre exemple</td>
+                <td>Generate random example</td>
+              </tr>
+              <tr>
+                <td><Key>,</Key> ou <Key>p</Key></td>
+                <td>Voir les parts</td>
+                <td>See components</td>
+              </tr>
+              <tr>
+                <td><Key>.</Key> ou <Key>c</Key></td>
+                <td>Voir la phrase conjugé</td>
+                <td>See conjugated phrase</td>
+              </tr>
+              <tr>
+                <td><Key>space</Key></td>
+                <td>Prononcer la phrase conjugé</td>
+                <td>Speak conjugated phrase</td>
+              </tr>
+            </tbody>
           </table>
-        </Typography>
+        </Paper>
       </Popover>
 
       <div className="card">

@@ -5,13 +5,6 @@ function findVoice(lang: String) {
 	return v
 }
 
-export function speak(text: String) {
-	// let v = findVoice("fr-FR")
-
-	let u = new SpeechSynthesisUtterance(text)
-	// u.voice = v
-	speechSynthesis.speak(u)
-}
 
 
 export const PERSONNES = [
