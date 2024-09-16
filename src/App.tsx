@@ -50,9 +50,6 @@ function Key({ children }) {
   )
 }
 
-function InstructionsPopup() {
-  
-}
 
 function App() {
 
@@ -63,6 +60,9 @@ function App() {
     personne: "nous",
     conjugé: "nous avons su",
   })
+
+  const [UILanguage, setUILanguage] = useState("fr")
+  const locale = (versions) => versions[UILanguage]
 
 
   const [selectedPersonnes, setSelectedPersonnes] = useState(PERSONNES)
@@ -96,18 +96,13 @@ function App() {
     return all.size > 0 ? Array.from(all) : VERBES
   }
 
-  function getSelectedPersonnes() {
-    return selectedPersonnes.length > 0 ? selectedPersonnes : PERSONNES
-  }
-
-  function getSelectedTemps() {
-    return selectedTemps.length > 0 ? selectedTemps : TEMPS
-  }
 
   function getSampleSpace() {
+    if (selectedPersonnes.length == 0) setSelectedPersonnes(PERSONNES)
+    if (selectedTemps.length == 0) setSelectedTemps(TEMPS.slice(0, 1))
     return {
-      personnes: getSelectedPersonnes(),
-      temps: getSelectedTemps(),
+      personnes: selectedPersonnes,
+      temps: selectedTemps,
       verbes: getSelectedVerbes(),
     }
   }
@@ -170,11 +165,20 @@ function App() {
 
   return (
     <>
-      <h1>Conjugueur Français</h1>
+      <h1>{locale({fr: "Conjugueur Français", en: "French conjugator"})}</h1>
+
+      <Typography>🇫🇷<Switch
+        checked={UILanguage == "en"}
+        onChange={(event, value) => setUILanguage(value ? "en" : "fr")}
+        sx={{
+            filter: "saturate(0%)"
+        }}
+      />🇬🇧</Typography>
 
       <Button onClick={handleClick}>
-        Instructions
+        {locale({fr: "Aide", en: "Help"})}
       </Button>
+
       <Popover
         open={open}
         anchorEl={anchorEl}
@@ -240,35 +244,30 @@ function App() {
         <Stack spacing={3}>
 
           <Autocomplete
+            multiple
             disableCloseOnSelect
             options={[
-              {label: "(sélectionner toutes)", expand: new Set(PERSONNES)},
+              {label: locale({fr: "(sélectionner toutes)", en: "(select all)"}), expand: new Set(PERSONNES)},
               ...PERSONNES,
             ]}
             value={selectedPersonnes}
-            onChange={(event, value) => {
-              let v = expandAliases(value)
-              setSelectedPersonnes(v)
-              console.log(v, value.indexOf({pronom: "all"}) )
-            }}
-            multiple
-            // groupBy={option => `${option.personne}° ${option.plureil ? "plureil" : "singulier"}`}
+            onChange={(event, value) => setSelectedPersonnes(expandAliases(value))}
             getOptionLabel={option => option.pronom || option.label}
-            renderInput={(params) => <TextField {...params} label="Personnes" />}
+            renderInput={(params) => <TextField {...params} label={locale({fr: "Personnes grammaticales", en: "Grammatical person"})} />}
           />
 
           <Autocomplete
             multiple
             disableCloseOnSelect
             options={[
-              {label: "(sélectionner toutes)", expand: new Set(TEMPS)},
+              {label: locale({fr: "(sélectionner toutes)", en: "(select all)"}), expand: new Set(TEMPS)},
               ...TEMPS,
             ]}
             value={selectedTemps}
             onChange={(event, v) => setSelectedTemps(expandAliases(v))}
             groupBy={option => option.mode}
             getOptionLabel={option => `${option.temps} (${option.mode})`.replaceAll('_', ' ')}
-            renderInput={(params) => <TextField {...params} label="Modes et temps" />}
+            renderInput={(params) => <TextField {...params} label={locale({fr: "Modes et temps", en: "Moods and tenses"})} />}
             renderOption={(props, option) => {
               const {key, ...optionProps} = props
               return <Box key={props.key} {...optionProps}>{option.temps?.replaceAll('_', ' ') || option.label}</Box>
@@ -283,7 +282,7 @@ function App() {
             onChange={(event, v) => setSelectedVerbes(v)}
             groupBy={option => option.group == undefined ? "individual verbs" : null}
             getOptionLabel={verb => verb.infinitif ?? verb.group}
-            renderInput={(params) => <TextField {...params} label="Verbes" />}
+            renderInput={(params) => <TextField {...params} label={locale({fr: "Verbes", en: "Verbs"})} />}
           />
 
 
@@ -291,7 +290,7 @@ function App() {
             variant="contained"
             onClick={() => randomButton()}
           >
-            Choisir au hasard
+            {locale({fr: "Phrase aléatoire", en: "Random phrase"})}
           </Button>
 
           <Grid container spacing={3}>
@@ -301,7 +300,7 @@ function App() {
                 variant="outlined"
                 onClick={() => prononcer()}
               >
-                Prononcer
+                {locale({fr: "Prononcer", en: "Speak"})}
               </Button>
               <Switch
                 checked={prononcerSwitch}
@@ -315,7 +314,7 @@ function App() {
                 variant="outlined"
                 onClick={() => setShowParts(true)}
               >
-                Décomposer
+                {locale({fr: "Décomposer", en: "Show parts"})}
               </Button>
               <Switch
                 checked={partsSwitch}
@@ -332,7 +331,7 @@ function App() {
                 variant="outlined"
                 onClick={() => setShowConjugé(true)}
               >
-                Conjuger
+                {locale({fr: "Conjuger", en: "Show conjugated"})}
               </Button>
               <Switch
                 checked={conjugéSwitch}
