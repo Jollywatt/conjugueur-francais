@@ -29,10 +29,17 @@ import {
 } from './conjugation.tsx'
 
 
+import removeAccents from 'remove-accents'
+
+
 function Key({ children }) {
   return (
     <span className="key">{children}</span>
   )
+}
+
+function InstructionsPopup() {
+  
 }
 
 function App() {
@@ -45,31 +52,29 @@ function App() {
     conjugé: "nous avons su",
   })
 
-  const [settings, setSettings] = useState({
-    prononcer: false,
-    parts: true,
-    conjugé: true,
-  })
+
+  const [selectedPersonnes, setSelectedPersonnes] = useState(PERSONNES)
+  const [selectedTemps, setSelectedTemps] = useState(TEMPS.slice(0, 3))
+  const [selectedVerbes, setSelectedVerbes] = useState(VERBE_MENU.slice(0, 1))
+
+  const [prononcerSwitch, setPrononcerSwitch] = useState<boolean>(false)
+  const [partsSwitch, setPartsSwitch] = useState<boolean>(false)
+  const [conjugéSwitch, setConjugéSwitch] = useState<boolean>(false)
+  
+  const [showParts, setShowParts] = useState<boolean>(false)
+  const [showConjugé, setShowConjugé] = useState<boolean>(false)
 
   const [voice, setVoice] = useState(null)
   const availableVoices = speechSynthesis.getVoices()
     .map(v => {v.is_fr = v.lang == 'fr-FR'; return v})
     .sort((a, b) => a.is_fr != b.is_fr ? a.is_fr < b.is_fr : a.lang > b.lang )
 
-  const [revealed, setRevealed] = useState({
-    parts: false,
-    conjugé: false
-  })
 
-
-  const [personnes, setPersonnes] = useState(PERSONNES)
-  const [temps, setTemps] = useState(TEMPS.slice(0, 3))
-  const [verbes, setVerbs] = useState(VERBE_MENU.slice(0, 1))
 
 
   function getSelectedVerbes() {
     let all = new Set()
-    for (let entry of verbes) {
+    for (let entry of selectedVerbes) {
       if (entry.infinitif !== undefined) {
         all.add(entry.infinitif)
       } else if (entry.verbes !== undefined) {
@@ -80,11 +85,11 @@ function App() {
   }
 
   function getSelectedPersonnes() {
-    return personnes.length > 0 ? personnes : PERSONNES
+    return selectedPersonnes.length > 0 ? selectedPersonnes : PERSONNES
   }
 
   function getSelectedTemps() {
-    return temps.length > 0 ? temps : TEMPS
+    return selectedTemps.length > 0 ? selectedTemps : TEMPS
   }
 
   function getSampleSpace() {
@@ -102,48 +107,42 @@ function App() {
     speechSynthesis.speak(u)
   }
 
+  function prononcer(conj) {
+    if (conj === undefined) conj = currentConjugation
+    // speak(currentConjugation.conjugé)
+    let filename = removeAccents(`/${conj.verbe}/${conj.mode}/${conj.temps}/${conj.conjugé}.mp3`).replaceAll(' ', '_')
+    console.log(filename)
 
-  function prononcer() {
-    speak(currentConjugation.conjugé)
+    let audio = new Audio(filename)
+    audio.play()
   }
 
   function randomButton() {
     let parts = chooseRandom(getSampleSpace())
     let conjugé = conjugate(parts)
 
-    setCurrentConjugation({
+    let conj = {
       mode: parts.temps.mode,
       temps: parts.temps.temps,
       verbe: parts.verbe,
       personne: parts.personne,
       conjugé,
-    })
+    }
+    setCurrentConjugation(conj)
 
-    setRevealed({
-      parts: settings.parts,
-      conjugé: settings.conjugé,
-    })
+    setShowParts(partsSwitch)
+    setShowConjugé(conjugéSwitch)
 
-    if (settings.prononcer) speak(conjugé)
+    if (prononcerSwitch) prononcer(conj)
   }
 
-  function partsButton() {
-    setRevealed({...revealed, parts: true})
-  }
-  function conjugéButton() {
-    setRevealed({...revealed, conjugé: true})
-  }
 
   useEffect(() => randomButton(), [])
 
   useHotkeys('return', randomButton)
-  useHotkeys('space', prononcer)
-  useHotkeys('comma,p', () => {
-    setRevealed({...revealed, parts: !revealed.parts})
-  })
-  useHotkeys('.,c', () => {
-    setRevealed({...revealed, conjugé: !revealed.conjugé})
-  })
+  useHotkeys('space', () => prononcer())
+  useHotkeys('comma,p', () => setShowParts(!showParts))
+  useHotkeys('.,c', () => setShowConjugé(!showConjugé))
 
   const [anchorEl, setAnchorEl] = useState(null);
 
@@ -231,8 +230,8 @@ function App() {
           <Autocomplete
             disableCloseOnSelect
             options={PERSONNES}
-            value={personnes}
-            onChange={(event, v) => setPersonnes(v)}
+            value={selectedPersonnes}
+            onChange={(event, v) => setSelectedPersonnes(v)}
             multiple
             // groupBy={option => `${option.personne}° ${option.plureil ? "plureil" : "singulier"}`}
             getOptionLabel={option => option.pronom}
@@ -247,8 +246,8 @@ function App() {
             multiple
             disableCloseOnSelect
             options={TEMPS}
-            value={temps}
-            onChange={(event, v) => setTemps(v)}
+            value={selectedTemps}
+            onChange={(event, v) => setSelectedTemps(v)}
             groupBy={option => option.mode}
             getOptionLabel={option => `${option.temps} (${option.mode})`.replaceAll('_', ' ')}
             renderInput={(params) => <TextField {...params} label="Modes et temps" />}
@@ -262,8 +261,8 @@ function App() {
             multiple
             disableCloseOnSelect
             options={VERBE_MENU}
-            value={verbes}
-            onChange={(event, v) => setVerbs(v)}
+            value={selectedVerbes}
+            onChange={(event, v) => setSelectedVerbes(v)}
             groupBy={option => option.group == undefined ? "individual verbs" : "groups"}
             getOptionLabel={verb => verb.infinitif ?? verb.group}
             renderInput={(params) => <TextField {...params} label="Verbes" />}
@@ -274,7 +273,7 @@ function App() {
             variant="contained"
             onClick={() => randomButton()}
           >
-            Au hasard
+            Choisir au hasard
           </Button>
 
           <Grid container spacing={3}>
@@ -282,13 +281,13 @@ function App() {
               <Button
                 fullWidth
                 variant="outlined"
-                onClick={prononcer}
+                onClick={() => prononcer()}
               >
                 Prononcer
               </Button>
               <Switch
-                checked={settings.prononcer}
-                onChange={(event, value) => setSettings({...settings, prononcer: value})}
+                checked={prononcerSwitch}
+                onChange={(event, value) => setPrononcerSwitch(value)}
               />
             </Grid>
 
@@ -296,15 +295,15 @@ function App() {
               <Button
                 fullWidth
                 variant="outlined"
-                onClick={partsButton}
+                onClick={() => setShowParts(true)}
               >
                 Décomposer
               </Button>
               <Switch
-                checked={settings.parts}
+                checked={partsSwitch}
                 onChange={(event, value) => {
-                  setSettings({...settings, parts: value})
-                  setRevealed({...revealed, parts: value})
+                  setPartsSwitch(value)
+                  setShowParts(value)
                 }}
               />
             </Grid>
@@ -313,25 +312,25 @@ function App() {
               <Button
                 fullWidth
                 variant="outlined"
-                onClick={conjugéButton}
+                onClick={() => setShowConjugé(true)}
               >
                 Conjuger
               </Button>
               <Switch
-                checked={settings.conjugé}
+                checked={conjugéSwitch}
                 onChange={(event, value) => {
-                  setSettings({...settings, conjugé: value})
-                  setRevealed({...revealed, conjugé: value})
+                  setConjugéSwitch(value)
+                  setShowConjugé(value)
                 }}
               />
             </Grid>
           </Grid>
 
-          <h3 style={{visibility: revealed.parts ? 'visible' : 'hidden'}}>
+          <h3 style={{visibility: showParts ? 'visible' : 'hidden'}}>
           « {currentConjugation.personne.pronom} + {currentConjugation.verbe} »
           au {currentConjugation.temps} ({currentConjugation.mode})</h3>
 
-          <h2 id="conjugé" style={{visibility: revealed.conjugé ? 'visible' : 'hidden'}}>{currentConjugation.conjugé}</h2>
+          <h2 id="conjugé" style={{visibility: showConjugé ? 'visible' : 'hidden'}}>{currentConjugation.conjugé}</h2>
 
         </Stack>
       </div>
