@@ -1,12 +1,3 @@
-function findVoice(lang: String) {
-	// let voices = speechSynthesis.getVoices().filter(v => v.lang == lang && /Thomas|v.name )
-	let v = voices[Math.floor(Math.random()*voices.length)]
-	console.log(voices, v)
-	return v
-}
-
-
-
 export const PERSONNES = [
 	{pronom: "je",    personne: 1, plureil: false, index: 0},
 	{pronom: "tu",    personne: 2, plureil: false, index: 1},
@@ -66,7 +57,7 @@ export const VERBE_MENU = [
 	{group: "Toutes verbes", verbes: new Set(VERBES)},
 ]
 
-for (let verbe of VERBES) {
+for (const verbe of VERBES) {
 	VERBE_MENU.push({infinitif: verbe})
 }
 
@@ -87,7 +78,7 @@ export function chooseRandom({personnes, temps, verbes}) {
 }
 
 export function conjugate({personne, temps, verbe}) {
-	let t = temps.temps.replaceAll(' ', '_')
+	const t = temps.temps.replaceAll(' ', '_')
 	let conj = CONJUGASIONS[verbe]![temps.mode][t][personne.index]
 	if (/^(elle|on)/.test(personne.pronom)) {
 		conj = conj.replace(/ils?/, personne.pronom)

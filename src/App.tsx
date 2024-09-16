@@ -4,13 +4,9 @@ import {
   Box,
   Button,
   Switch,
-  Select,
-  MenuItem,
   Stack,
   TextField,
   Grid2 as Grid,
-  createTheme,
-  ThemeProvider,
   Popover,
   Typography,
   Paper,
@@ -34,7 +30,7 @@ import removeAccents from 'remove-accents'
 
 function expandAliases(values) {
   let expandedValues = new Set()
-  for (let value of values) {
+  for (const value of values) {
     if (value.expand !== undefined) {
       expandedValues = expandedValues.union(value.expand)
     } else {
@@ -76,17 +72,17 @@ function App() {
   const [showParts, setShowParts] = useState<boolean>(false)
   const [showConjugé, setShowConjugé] = useState<boolean>(false)
 
-  const [voice, setVoice] = useState(null)
-  const availableVoices = speechSynthesis.getVoices()
-    .map(v => {v.is_fr = v.lang == 'fr-FR'; return v})
-    .sort((a, b) => a.is_fr != b.is_fr ? a.is_fr < b.is_fr : a.lang > b.lang )
+  // const [voice, setVoice] = useState(null)
+  // const availableVoices = speechSynthesis.getVoices()
+  //   .map(v => {v.is_fr = v.lang == 'fr-FR'; return v})
+  //   .sort((a, b) => a.is_fr != b.is_fr ? a.is_fr < b.is_fr : a.lang > b.lang )
 
 
 
 
   function getSelectedVerbes() {
     let all = new Set()
-    for (let entry of selectedVerbes) {
+    for (const entry of selectedVerbes) {
       if (entry.infinitif !== undefined) {
         all.add(entry.infinitif)
       } else if (entry.verbes !== undefined) {
@@ -107,28 +103,28 @@ function App() {
     }
   }
 
-  function speak(text: String, v) {
-    let u = new SpeechSynthesisUtterance(text)
-    u.voice = v ?? voice
-    u.rate = 0.8
-    speechSynthesis.speak(u)
-  }
+  // function speak(text: String, v) {
+  //   let u = new SpeechSynthesisUtterance(text)
+  //   u.voice = v ?? voice
+  //   u.rate = 0.8
+  //   speechSynthesis.speak(u)
+  // }
 
   function prononcer(conj) {
     if (conj === undefined) conj = currentConjugation
     // speak(currentConjugation.conjugé)
-    let filename = removeAccents(`${import.meta.env.BASE_URL}/audio/${conj.verbe}/${conj.mode}/${conj.temps}/${conj.conjugé}.mp3`).replaceAll(' ', '_')
+    const filename = removeAccents(`${import.meta.env.BASE_URL}/audio/${conj.verbe}/${conj.mode}/${conj.temps}/${conj.conjugé}.mp3`).replaceAll(' ', '_')
     console.log(filename)
 
-    let audio = new Audio(filename)
+    const audio = new Audio(filename)
     audio.play()
   }
 
   function randomButton() {
-    let parts = chooseRandom(getSampleSpace())
-    let conjugé = conjugate(parts)
+    const parts = chooseRandom(getSampleSpace())
+    const conjugé = conjugate(parts)
 
-    let conj = {
+    const conj = {
       mode: parts.temps.mode,
       temps: parts.temps.temps,
       verbe: parts.verbe,
@@ -164,15 +160,25 @@ function App() {
   const open = Boolean(anchorEl);
 
   return (
-    <>
+    <Stack spacing={3}>
+
       <h1>{locale({fr: "Conjugueur Français", en: "French conjugator"})}</h1>
 
-
-      <Button onClick={handleClick}>
-        {locale({fr: "Aide", en: "Help"})}
-      </Button>
+      <div>
+        <Button onClick={handleClick}>
+          {locale({fr: "Aide", en: "Help"})}
+        </Button>
+        <Typography>🇫🇷<Switch
+          checked={UILanguage == "en"}
+          onChange={(event, value) => setUILanguage(value ? "en" : "fr")}
+          sx={{
+              filter: "saturate(0%)"
+          }}
+        />🇬🇧</Typography>
+      </div>
 
       <Popover
+      sx={{ maxWidth: 'md' }}
         open={open}
         anchorEl={anchorEl}
         onClose={handleClose}
@@ -185,9 +191,11 @@ function App() {
           horizontal: 'center',
         }}
       >
+
+
         <Paper sx={{ p: 2 }}>
 
-            <Typography>🇫🇷<Switch
+          <Typography textAlign="center">🇫🇷<Switch
               checked={UILanguage == "en"}
               onChange={(event, value) => setUILanguage(value ? "en" : "fr")}
               sx={{
@@ -202,8 +210,8 @@ function App() {
                 et en activant uniquement « discours », vous pouvez apprendre à quoi ressemblent les différents temps.              </p>,
               en: <p>
                 The toggle switches control what is shown when a new phrase is chosen.
-                For example, by selecting only the "parts" switch, you can practice verb conjugations,
-                and by selecting only the "speech" switch, you can learn how the different tenses sound.
+                For example, by selecting only the "show parts" switch, you can practice verb conjugations,
+                and by selecting only the "speak" switch, you can learn how the different tenses sound.
               </p>,
             })}
 
@@ -278,119 +286,115 @@ function App() {
         </Paper>
       </Popover>
 
-      <div className="card">
 
-        <Stack spacing={3}>
 
-          <Autocomplete
-            multiple
-            disableCloseOnSelect
-            options={[
-              {label: locale({fr: "(sélectionner toutes)", en: "(select all)"}), expand: new Set(PERSONNES)},
-              ...PERSONNES,
-            ]}
-            value={selectedPersonnes}
-            onChange={(event, value) => setSelectedPersonnes(expandAliases(value))}
-            getOptionLabel={option => option.pronom || option.label}
-            renderInput={(params) => <TextField {...params} label={locale({fr: "Personnes grammaticales", en: "Grammatical person"})} />}
+      <Autocomplete
+        multiple
+        disableCloseOnSelect
+        options={[
+          {label: locale({fr: "(sélectionner toutes)", en: "(select all)"}), expand: new Set(PERSONNES)},
+          ...PERSONNES,
+        ]}
+        value={selectedPersonnes}
+        onChange={(event, value) => setSelectedPersonnes(expandAliases(value))}
+        getOptionLabel={option => option.pronom || option.label}
+        renderInput={(params) => <TextField {...params} label={locale({fr: "Personnes grammaticales", en: "Grammatical person"})} />}
+      />
+
+      <Autocomplete
+        multiple
+        disableCloseOnSelect
+        options={[
+          {label: locale({fr: "(sélectionner toutes)", en: "(select all)"}), expand: new Set(TEMPS)},
+          ...TEMPS,
+        ]}
+        value={selectedTemps}
+        onChange={(event, v) => setSelectedTemps(expandAliases(v))}
+        groupBy={option => option.mode}
+        getOptionLabel={option => `${option.temps} (${option.mode})`.replaceAll('_', ' ')}
+        renderInput={(params) => <TextField {...params} label={locale({fr: "Modes et temps", en: "Moods and tenses"})} />}
+        renderOption={(props, option) => {
+          const {key, ...optionProps} = props
+          return <Box key={key} {...optionProps}>{option.temps?.replaceAll('_', ' ') || option.label}</Box>
+        }}
+      />
+
+      <Autocomplete
+        multiple
+        disableCloseOnSelect
+        options={VERBE_MENU}
+        value={selectedVerbes}
+        onChange={(event, v) => setSelectedVerbes(expandAliases(v))}
+        groupBy={option => option.group == undefined ? locale({fr: "verbes individuels", en: "individual verbs"}) : null}
+        getOptionLabel={verb => verb.infinitif ?? verb.group}
+        renderInput={(params) => <TextField {...params} label={locale({fr: "Verbes", en: "Verbs"})} />}
+      />
+
+
+      <Button
+        variant="contained"
+        onClick={() => randomButton()}
+      >
+        {locale({fr: "Phrase aléatoire", en: "Random phrase"})}
+      </Button>
+
+      <Grid container spacing={2}>
+        <Grid size={4}>
+          <Button
+            fullWidth
+            variant="outlined"
+            onClick={() => prononcer()}
+          >
+            {locale({fr: "Prononcer", en: "Speak"})}
+          </Button>
+          <Switch
+            checked={prononcerSwitch}
+            onChange={(event, value) => setPrononcerSwitch(value)}
           />
+        </Grid>
 
-          <Autocomplete
-            multiple
-            disableCloseOnSelect
-            options={[
-              {label: locale({fr: "(sélectionner toutes)", en: "(select all)"}), expand: new Set(TEMPS)},
-              ...TEMPS,
-            ]}
-            value={selectedTemps}
-            onChange={(event, v) => setSelectedTemps(expandAliases(v))}
-            groupBy={option => option.mode}
-            getOptionLabel={option => `${option.temps} (${option.mode})`.replaceAll('_', ' ')}
-            renderInput={(params) => <TextField {...params} label={locale({fr: "Modes et temps", en: "Moods and tenses"})} />}
-            renderOption={(props, option) => {
-              const {key, ...optionProps} = props
-              return <Box key={props.key} {...optionProps}>{option.temps?.replaceAll('_', ' ') || option.label}</Box>
+        <Grid size={4}>
+          <Button
+            fullWidth
+            variant="outlined"
+            onClick={() => setShowParts(true)}
+          >
+            {locale({fr: "Décomposer", en: "Show parts"})}
+          </Button>
+          <Switch
+            checked={partsSwitch}
+            onChange={(event, value) => {
+              setPartsSwitch(value)
+              setShowParts(value)
             }}
           />
+        </Grid>
 
-          <Autocomplete
-            multiple
-            disableCloseOnSelect
-            options={VERBE_MENU}
-            value={selectedVerbes}
-            onChange={(event, v) => setSelectedVerbes(expandAliases(v))}
-            groupBy={option => option.group == undefined ? locale({fr: "verbes individuels", en: "individual verbs"}) : null}
-            getOptionLabel={verb => verb.infinitif ?? verb.group}
-            renderInput={(params) => <TextField {...params} label={locale({fr: "Verbes", en: "Verbs"})} />}
-          />
-
-
+        <Grid size={4}>
           <Button
-            variant="contained"
-            onClick={() => randomButton()}
+            fullWidth
+            variant="outlined"
+            onClick={() => setShowConjugé(true)}
           >
-            {locale({fr: "Phrase aléatoire", en: "Random phrase"})}
+            {locale({fr: "Conjuger", en: "Show conjugated"})}
           </Button>
+          <Switch
+            checked={conjugéSwitch}
+            onChange={(event, value) => {
+              setConjugéSwitch(value)
+              setShowConjugé(value)
+            }}
+          />
+        </Grid>
+      </Grid>
 
-          <Grid container spacing={3}>
-            <Grid size={4}>
-              <Button
-                fullWidth
-                variant="outlined"
-                onClick={() => prononcer()}
-              >
-                {locale({fr: "Prononcer", en: "Speak"})}
-              </Button>
-              <Switch
-                checked={prononcerSwitch}
-                onChange={(event, value) => setPrononcerSwitch(value)}
-              />
-            </Grid>
+      <h3 style={{visibility: showParts ? 'visible' : 'hidden'}}>
+      « {currentConjugation.personne.pronom} + {currentConjugation.verbe} »
+      au {currentConjugation.temps} ({currentConjugation.mode})</h3>
 
-            <Grid size={4}>
-              <Button
-                fullWidth
-                variant="outlined"
-                onClick={() => setShowParts(true)}
-              >
-                {locale({fr: "Décomposer", en: "Show parts"})}
-              </Button>
-              <Switch
-                checked={partsSwitch}
-                onChange={(event, value) => {
-                  setPartsSwitch(value)
-                  setShowParts(value)
-                }}
-              />
-            </Grid>
+      <h2 id="conjugé" style={{visibility: showConjugé ? 'visible' : 'hidden'}}>{currentConjugation.conjugé}</h2>
 
-            <Grid size={4}>
-              <Button
-                fullWidth
-                variant="outlined"
-                onClick={() => setShowConjugé(true)}
-              >
-                {locale({fr: "Conjuger", en: "Show conjugated"})}
-              </Button>
-              <Switch
-                checked={conjugéSwitch}
-                onChange={(event, value) => {
-                  setConjugéSwitch(value)
-                  setShowConjugé(value)
-                }}
-              />
-            </Grid>
-          </Grid>
-
-          <h3 style={{visibility: showParts ? 'visible' : 'hidden'}}>
-          « {currentConjugation.personne.pronom} + {currentConjugation.verbe} »
-          au {currentConjugation.temps} ({currentConjugation.mode})</h3>
-
-          <h2 id="conjugé" style={{visibility: showConjugé ? 'visible' : 'hidden'}}>{currentConjugation.conjugé}</h2>
-
-        </Stack>
-      </div>
-    </>
+    </Stack>
   )
 }
 
