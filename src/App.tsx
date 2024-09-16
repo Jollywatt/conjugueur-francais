@@ -14,6 +14,8 @@ import {
 import { useHotkeys } from 'react-hotkeys-hook'
 
 import './App.css'
+import { ThemeProvider, createTheme, useColorScheme } from '@mui/material/styles';
+
 
 import {
   TEMPS,
@@ -45,6 +47,8 @@ function Key({ children }) {
     <span className="key">{children}</span>
   )
 }
+
+import useMediaQuery from '@mui/material/useMediaQuery';
 
 
 function App() {
@@ -159,7 +163,14 @@ function App() {
 
   const open = Boolean(anchorEl);
 
-  return (
+  const theme = createTheme({
+    colorSchemes: {
+      dark: useMediaQuery('(prefers-color-scheme: dark)'),
+    },
+  })
+
+
+  return <ThemeProvider theme={theme}>
     <Stack spacing={3}>
 
       <h1>{locale({fr: "Conjugueur Français", en: "French conjugator"})}</h1>
@@ -395,7 +406,7 @@ function App() {
       <h2 id="conjugé" style={{visibility: showConjugé ? 'visible' : 'hidden'}}>{currentConjugation.conjugé}</h2>
 
     </Stack>
-  )
+  </ThemeProvider>
 }
 
 export default App
