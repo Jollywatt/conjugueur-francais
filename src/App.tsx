@@ -32,6 +32,18 @@ import {
 import removeAccents from 'remove-accents'
 
 
+function expandAliases(values) {
+  let expandedValues = new Set()
+  for (let value of values) {
+    if (value.expand !== undefined) {
+      expandedValues = expandedValues.union(value.expand)
+    } else {
+      expandedValues.add(value)
+    }
+  }
+  return Array.from(expandedValues)
+}
+
 function Key({ children }) {
   return (
     <span className="key">{children}</span>
@@ -60,7 +72,7 @@ function App() {
   const [prononcerSwitch, setPrononcerSwitch] = useState<boolean>(false)
   const [partsSwitch, setPartsSwitch] = useState<boolean>(false)
   const [conjugéSwitch, setConjugéSwitch] = useState<boolean>(false)
-  
+
   const [showParts, setShowParts] = useState<boolean>(false)
   const [showConjugé, setShowConjugé] = useState<boolean>(false)
 
@@ -229,31 +241,37 @@ function App() {
 
           <Autocomplete
             disableCloseOnSelect
-            options={PERSONNES}
+            options={[
+              {label: "(sélectionner toutes)", expand: new Set(PERSONNES)},
+              ...PERSONNES,
+            ]}
             value={selectedPersonnes}
-            onChange={(event, v) => setSelectedPersonnes(v)}
+            onChange={(event, value) => {
+              let v = expandAliases(value)
+              setSelectedPersonnes(v)
+              console.log(v, value.indexOf({pronom: "all"}) )
+            }}
             multiple
             // groupBy={option => `${option.personne}° ${option.plureil ? "plureil" : "singulier"}`}
-            getOptionLabel={option => option.pronom}
+            getOptionLabel={option => option.pronom || option.label}
             renderInput={(params) => <TextField {...params} label="Personnes" />}
-            renderOption={(props, option) => {
-              const {key, ...optionProps} = props
-              return <Box key={props.key} {...optionProps}>{option.pronom}</Box>
-            }}
           />
 
           <Autocomplete
             multiple
             disableCloseOnSelect
-            options={TEMPS}
+            options={[
+              {label: "(sélectionner toutes)", expand: new Set(TEMPS)},
+              ...TEMPS,
+            ]}
             value={selectedTemps}
-            onChange={(event, v) => setSelectedTemps(v)}
+            onChange={(event, v) => setSelectedTemps(expandAliases(v))}
             groupBy={option => option.mode}
             getOptionLabel={option => `${option.temps} (${option.mode})`.replaceAll('_', ' ')}
             renderInput={(params) => <TextField {...params} label="Modes et temps" />}
             renderOption={(props, option) => {
               const {key, ...optionProps} = props
-              return <Box key={props.key} {...optionProps}>{option.temps.replaceAll('_', ' ')}</Box>
+              return <Box key={props.key} {...optionProps}>{option.temps?.replaceAll('_', ' ') || option.label}</Box>
             }}
           />
 
@@ -263,7 +281,7 @@ function App() {
             options={VERBE_MENU}
             value={selectedVerbes}
             onChange={(event, v) => setSelectedVerbes(v)}
-            groupBy={option => option.group == undefined ? "individual verbs" : "groups"}
+            groupBy={option => option.group == undefined ? "individual verbs" : null}
             getOptionLabel={verb => verb.infinitif ?? verb.group}
             renderInput={(params) => <TextField {...params} label="Verbes" />}
           />

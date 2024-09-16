@@ -61,7 +61,7 @@ export const VERBE_MENU = [
 	{group: "1er groupe (-er)", verbes: new Set(VERBES_GROUPE_1)},
 	{group: "2e groupe (-ir)", verbes: new Set(VERBES_GROUPE_2)},
 	{group: "3e groupe (-ir, -re)", verbes: new Set(VERBES_GROUPE_3)},
-	{group: "Toutes", verbes: new Set(VERBES)},
+	{group: "Toutes verbes", verbes: new Set(VERBES)},
 ]
 
 for (let verbe of VERBES) {
