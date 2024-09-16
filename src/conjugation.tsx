@@ -57,7 +57,7 @@ export const VERBES_GROUPE_1 = VERBES.filter(v => VERBES_GROUPE_2.indexOf(v) < 0
 
 export const VERBE_MENU = [
 	{group: "Top 10", verbes: new Set(VERBES.slice(0, 10))},
-	{group: "Top 100", verbes: new Set(VERBES.slice(0, 100))},
+	{group: "Top 50", verbes: new Set(VERBES.slice(0, 50))},
 	{group: "1er groupe (-er)", verbes: new Set(VERBES_GROUPE_1)},
 	{group: "2e groupe (-ir)", verbes: new Set(VERBES_GROUPE_2)},
 	{group: "3e groupe (-ir, -re)", verbes: new Set(VERBES_GROUPE_3)},
