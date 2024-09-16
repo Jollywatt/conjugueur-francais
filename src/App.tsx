@@ -67,11 +67,11 @@ function App() {
 
   const [selectedPersonnes, setSelectedPersonnes] = useState(PERSONNES)
   const [selectedTemps, setSelectedTemps] = useState(TEMPS.slice(0, 3))
-  const [selectedVerbes, setSelectedVerbes] = useState(VERBE_MENU.slice(0, 1))
+  const [selectedVerbes, setSelectedVerbes] = useState(expandAliases(VERBE_MENU.slice(0, 1)))
 
   const [prononcerSwitch, setPrononcerSwitch] = useState<boolean>(false)
-  const [partsSwitch, setPartsSwitch] = useState<boolean>(false)
-  const [conjugéSwitch, setConjugéSwitch] = useState<boolean>(false)
+  const [partsSwitch, setPartsSwitch] = useState<boolean>(true)
+  const [conjugéSwitch, setConjugéSwitch] = useState<boolean>(true)
 
   const [showParts, setShowParts] = useState<boolean>(false)
   const [showConjugé, setShowConjugé] = useState<boolean>(false)
@@ -117,7 +117,7 @@ function App() {
   function prononcer(conj) {
     if (conj === undefined) conj = currentConjugation
     // speak(currentConjugation.conjugé)
-    let filename = removeAccents(`/${conj.verbe}/${conj.mode}/${conj.temps}/${conj.conjugé}.mp3`).replaceAll(' ', '_')
+    let filename = removeAccents(`${import.meta.env.BASE_URL}/audio/${conj.verbe}/${conj.mode}/${conj.temps}/${conj.conjugé}.mp3`).replaceAll(' ', '_')
     console.log(filename)
 
     let audio = new Audio(filename)
@@ -167,13 +167,6 @@ function App() {
     <>
       <h1>{locale({fr: "Conjugueur Français", en: "French conjugator"})}</h1>
 
-      <Typography>🇫🇷<Switch
-        checked={UILanguage == "en"}
-        onChange={(event, value) => setUILanguage(value ? "en" : "fr")}
-        sx={{
-            filter: "saturate(0%)"
-        }}
-      />🇬🇧</Typography>
 
       <Button onClick={handleClick}>
         {locale({fr: "Aide", en: "Help"})}
@@ -194,7 +187,37 @@ function App() {
       >
         <Paper sx={{ p: 2 }}>
 
-          <h4>Voix synthétique pour la prononciation:</h4>
+            <Typography>🇫🇷<Switch
+              checked={UILanguage == "en"}
+              onChange={(event, value) => setUILanguage(value ? "en" : "fr")}
+              sx={{
+                  filter: "saturate(0%)"
+              }}
+            />🇬🇧</Typography>
+
+            {locale({
+              fr: <p>
+                Les commutateurs à bascule contrôlent ce qui est affiché lorsqu'une nouvelle phrase est choisie.
+                Par exemple, en activant uniquement « parties », vous pouvez pratiquer la conjugaison des verbes,
+                et en activant uniquement « discours », vous pouvez apprendre à quoi ressemblent les différents temps.              </p>,
+              en: <p>
+                The toggle switches control what is shown when a new phrase is chosen.
+                For example, by selecting only the "parts" switch, you can practice verb conjugations,
+                and by selecting only the "speech" switch, you can learn how the different tenses sound.
+              </p>,
+            })}
+
+            {locale({
+              fr: <p>
+                Les prononcés sont téléchargés sous forme de clips audio. Seuls les 50 premiers verbes ont de l’audio.
+              </p>,
+              en: <p>
+                Pronounciations are downloaded as audio clips. Only the top 50 verbs have audio.
+              </p>,
+            })}
+
+
+       {/*   <h4>Voix synthétique pour la prononciation:</h4>
           <Autocomplete
             label="Voix"
             value={voice}
@@ -208,33 +231,49 @@ function App() {
             getOptionLabel={v => !v ? "Default" : `${v.lang} “${v.name}” ${v.voiceURI}`}
             renderInput={(params) => <TextField {...params} label="Voix" />}
           />
-          <p>Laisser vide pour la voix par défaut.</p>
+          <p>Laisser vide pour la voix par défaut.</p>*/}
 
-          <h4>Keyboard shortcuts</h4>
+          <h4>{locale({fr: "Raccourcis clavier", en: "Keyboard shortcuts"})}</h4>
 
-          <table>
-            <tbody>
-              <tr>
-                <td><Key>return</Key></td>
-                <td>Choisir une autre exemple</td>
-                <td>Generate random example</td>
-              </tr>
-              <tr>
-                <td><Key>,</Key> ou <Key>p</Key></td>
-                <td>Voir les parts</td>
-                <td>See components</td>
-              </tr>
-              <tr>
-                <td><Key>.</Key> ou <Key>c</Key></td>
-                <td>Voir la phrase conjugé</td>
-                <td>See conjugated phrase</td>
-              </tr>
-              <tr>
-                <td><Key>space</Key></td>
-                <td>Prononcer la phrase conjugé</td>
-                <td>Speak conjugated phrase</td>
-              </tr>
-            </tbody>
+          <table id="keymap">
+            {locale({
+              fr: <tbody>
+                <tr>
+                  <td><Key>retour</Key></td>
+                  <td>Choisir une autre exemple</td>
+                </tr>
+                <tr>
+                  <td><Key>,</Key> ou <Key>p</Key></td>
+                  <td>Voir les parts</td>
+                </tr>
+                <tr>
+                  <td><Key>.</Key> ou <Key>c</Key></td>
+                  <td>Voir la phrase conjugé</td>
+                </tr>
+                <tr>
+                  <td><Key>espace</Key></td>
+                  <td>Prononcer la phrase conjugé</td>
+                </tr>
+              </tbody>,
+              en: <tbody>
+                <tr>
+                  <td><Key>return</Key></td>
+                  <td>Generate random example</td>
+                </tr>
+                <tr>
+                  <td><Key>,</Key> or <Key>p</Key></td>
+                  <td>See components</td>
+                </tr>
+                <tr>
+                  <td><Key>.</Key> or <Key>c</Key></td>
+                  <td>See conjugated phrase</td>
+                </tr>
+                <tr>
+                  <td><Key>space</Key></td>
+                  <td>Speak conjugated phrase</td>
+                </tr>
+              </tbody>,
+            })}
           </table>
         </Paper>
       </Popover>
@@ -279,8 +318,8 @@ function App() {
             disableCloseOnSelect
             options={VERBE_MENU}
             value={selectedVerbes}
-            onChange={(event, v) => setSelectedVerbes(v)}
-            groupBy={option => option.group == undefined ? "individual verbs" : null}
+            onChange={(event, v) => setSelectedVerbes(expandAliases(v))}
+            groupBy={option => option.group == undefined ? locale({fr: "verbes individuels", en: "individual verbs"}) : null}
             getOptionLabel={verb => verb.infinitif ?? verb.group}
             renderInput={(params) => <TextField {...params} label={locale({fr: "Verbes", en: "Verbs"})} />}
           />
