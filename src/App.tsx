@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import {
   Autocomplete,
   Box,
@@ -12,10 +12,13 @@ import {
   Paper,
 } from '@mui/material'
 import { useHotkeys } from 'react-hotkeys-hook'
-
-import './App.css'
+import removeAccents from 'remove-accents'
+import useMediaQuery from '@mui/material/useMediaQuery';
+import VolumeUpIcon from '@mui/icons-material/VolumeUp'
 import { ThemeProvider, createTheme, useColorScheme } from '@mui/material/styles';
 
+// polyfill for Set.prototype.union for older Safari
+import 'core-js/actual/set'
 
 import {
   TEMPS,
@@ -26,10 +29,7 @@ import {
   conjugate,
 } from './conjugation.tsx'
 
-
-import removeAccents from 'remove-accents'
-
-import VolumeUpIcon from '@mui/icons-material/VolumeUp'
+import './App.css'
 
 
 function expandAliases(values) {
@@ -44,22 +44,11 @@ function expandAliases(values) {
   return Array.from(expandedValues)
 }
 
-function Key({ children }) {
-  return (
-    <span className="key">{children}</span>
-  )
-}
-
-import useMediaQuery from '@mui/material/useMediaQuery';
-
-function dog() {
-  return VERBES.map(v => removeAccents(v))
-}
-
+const Key = ({ children }) => <span className="key">{children}</span>
 const formatTemps = (mode, temps) => mode == "indicatif" ? temps : `${mode} ${temps}`
 
 function App() {
-window.dig = dog
+
   const [currentConjugation, setCurrentConjugation] = useState({
     mode: "indicatif",
     temps: "présent",
@@ -82,13 +71,6 @@ window.dig = dog
 
   const [showParts, setShowParts] = useState<boolean>(false)
   const [showConjugé, setShowConjugé] = useState<boolean>(false)
-
-  // const [voice, setVoice] = useState(null)
-  // const availableVoices = speechSynthesis.getVoices()
-  //   .map(v => {v.is_fr = v.lang == 'fr-FR'; return v})
-  //   .sort((a, b) => a.is_fr != b.is_fr ? a.is_fr < b.is_fr : a.lang > b.lang )
-
-
 
 
   function getSelectedVerbes() {
@@ -114,16 +96,9 @@ window.dig = dog
     }
   }
 
-  // function speak(text: String, v) {
-  //   let u = new SpeechSynthesisUtterance(text)
-  //   u.voice = v ?? voice
-  //   u.rate = 0.8
-  //   speechSynthesis.speak(u)
-  // }
 
   function prononcer(conj) {
     if (conj === undefined) conj = currentConjugation
-    // speak(currentConjugation.conjugé)
     const filename = removeAccents(`${import.meta.env.BASE_URL}/audio/${conj.verbe}/${conj.mode}/${conj.temps}/${conj.conjugé}.mp3`).replaceAll(' ', '_')
     console.log(filename)
 
@@ -158,24 +133,106 @@ window.dig = dog
   useHotkeys('comma,p', () => setShowParts(!showParts))
   useHotkeys('.,c', () => setShowConjugé(!showConjugé))
 
-  const [anchorEl, setAnchorEl] = useState(null);
-
-  const handleClick = event => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-
-  const open = Boolean(anchorEl);
 
   const theme = createTheme({
     colorSchemes: {
       dark: useMediaQuery('(prefers-color-scheme: dark)'),
     },
   })
+  const helpButtonRef = useRef()
+  const [showHelp, setShowHelp] = useState<boolean>(false);
 
+  const HelpWindow = props => <>
+    <Popover
+      open={props.show}
+      anchorEl={props.helpButtonRef.current}
+      onClose={props.onClose}
+      anchorOrigin={{
+        vertical: 'bottom',
+        horizontal: 'center',
+      }}
+      transformOrigin={{
+        vertical: 'top',
+        horizontal: 'center',
+      }}
+    >
+      <Paper sx={{ p: 2 }}>
+
+        <Typography textAlign="center">🇫🇷<Switch
+            checked={UILanguage == "en"}
+            onChange={(event, value) => setUILanguage(value ? "en" : "fr")}
+            sx={{
+                filter: "saturate(0%)"
+            }}
+          />🇬🇧</Typography>
+
+          {locale({
+            fr: <p>
+              Les commutateurs à bascule contrôlent ce qui est affiché lorsqu'une nouvelle phrase est choisie.
+              Par exemple, en activant uniquement « parties », vous pouvez pratiquer la conjugaison des verbes,
+              et en activant uniquement « discours », vous pouvez apprendre à quoi ressemblent les différents temps.              </p>,
+            en: <p>
+              The toggle switches control what is shown when a new phrase is chosen.
+              For example, by selecting only the "show parts" switch, you can practice verb conjugations,
+              and by selecting only the "speak" switch, you can learn how the different tenses sound.
+            </p>,
+          })}
+
+          {locale({
+            fr: <p>
+              Les prononcés sont téléchargés sous forme de clips audio. Seuls les 50 premiers verbes ont de l’audio.
+            </p>,
+            en: <p>
+              Pronounciations are downloaded as audio clips. Only the top 50 verbs have audio.
+            </p>,
+          })}
+
+
+        <h4>{locale({fr: "Raccourcis clavier", en: "Keyboard shortcuts"})}</h4>
+
+        <table id="keymap">
+          {locale({
+            fr: <tbody>
+              <tr>
+                <td><Key>retour</Key></td>
+                <td>Choisir une autre exemple</td>
+              </tr>
+              <tr>
+                <td><Key>,</Key> ou <Key>p</Key></td>
+                <td>Voir les parts</td>
+              </tr>
+              <tr>
+                <td><Key>.</Key> ou <Key>c</Key></td>
+                <td>Voir la phrase conjugé</td>
+              </tr>
+              <tr>
+                <td><Key>espace</Key></td>
+                <td>Prononcer la phrase conjugé</td>
+              </tr>
+            </tbody>,
+            en: <tbody>
+              <tr>
+                <td><Key>return</Key></td>
+                <td>Generate random example</td>
+              </tr>
+              <tr>
+                <td><Key>,</Key> or <Key>p</Key></td>
+                <td>See components</td>
+              </tr>
+              <tr>
+                <td><Key>.</Key> or <Key>c</Key></td>
+                <td>See conjugated phrase</td>
+              </tr>
+              <tr>
+                <td><Key>space</Key></td>
+                <td>Speak conjugated phrase</td>
+              </tr>
+            </tbody>,
+          })}
+        </table>
+      </Paper>
+    </Popover>
+  </>
 
   return <ThemeProvider theme={theme}>
     <Stack spacing={3}>
@@ -183,7 +240,9 @@ window.dig = dog
       <h1>{locale({fr: "Conjugueur Français", en: "French conjugator"})}</h1>
 
       <div>
-        <Button onClick={handleClick}>
+        <Button
+          ref={helpButtonRef}
+          onClick={e => setShowHelp(true)}>
           {locale({fr: "Aide", en: "Help"})}
         </Button>
         <Typography>🇫🇷<Switch
@@ -195,99 +254,11 @@ window.dig = dog
         />🇬🇧</Typography>
       </div>
 
-      <Popover
-      sx={{ maxWidth: 'md' }}
-        open={open}
-        anchorEl={anchorEl}
-        onClose={handleClose}
-        anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'center',
-        }}
-        transformOrigin={{
-          vertical: 'top',
-          horizontal: 'center',
-        }}
-      >
-
-
-        <Paper sx={{ p: 2 }}>
-
-          <Typography textAlign="center">🇫🇷<Switch
-              checked={UILanguage == "en"}
-              onChange={(event, value) => setUILanguage(value ? "en" : "fr")}
-              sx={{
-                  filter: "saturate(0%)"
-              }}
-            />🇬🇧</Typography>
-
-            {locale({
-              fr: <p>
-                Les commutateurs à bascule contrôlent ce qui est affiché lorsqu'une nouvelle phrase est choisie.
-                Par exemple, en activant uniquement « parties », vous pouvez pratiquer la conjugaison des verbes,
-                et en activant uniquement « discours », vous pouvez apprendre à quoi ressemblent les différents temps.              </p>,
-              en: <p>
-                The toggle switches control what is shown when a new phrase is chosen.
-                For example, by selecting only the "show parts" switch, you can practice verb conjugations,
-                and by selecting only the "speak" switch, you can learn how the different tenses sound.
-              </p>,
-            })}
-
-            {locale({
-              fr: <p>
-                Les prononcés sont téléchargés sous forme de clips audio. Seuls les 50 premiers verbes ont de l’audio.
-              </p>,
-              en: <p>
-                Pronounciations are downloaded as audio clips. Only the top 50 verbs have audio.
-              </p>,
-            })}
-
-
-          <h4>{locale({fr: "Raccourcis clavier", en: "Keyboard shortcuts"})}</h4>
-
-          <table id="keymap">
-            {locale({
-              fr: <tbody>
-                <tr>
-                  <td><Key>retour</Key></td>
-                  <td>Choisir une autre exemple</td>
-                </tr>
-                <tr>
-                  <td><Key>,</Key> ou <Key>p</Key></td>
-                  <td>Voir les parts</td>
-                </tr>
-                <tr>
-                  <td><Key>.</Key> ou <Key>c</Key></td>
-                  <td>Voir la phrase conjugé</td>
-                </tr>
-                <tr>
-                  <td><Key>espace</Key></td>
-                  <td>Prononcer la phrase conjugé</td>
-                </tr>
-              </tbody>,
-              en: <tbody>
-                <tr>
-                  <td><Key>return</Key></td>
-                  <td>Generate random example</td>
-                </tr>
-                <tr>
-                  <td><Key>,</Key> or <Key>p</Key></td>
-                  <td>See components</td>
-                </tr>
-                <tr>
-                  <td><Key>.</Key> or <Key>c</Key></td>
-                  <td>See conjugated phrase</td>
-                </tr>
-                <tr>
-                  <td><Key>space</Key></td>
-                  <td>Speak conjugated phrase</td>
-                </tr>
-              </tbody>,
-            })}
-          </table>
-        </Paper>
-      </Popover>
-
+      <HelpWindow
+        helpButtonRef={helpButtonRef}
+        show={showHelp}
+        onClose={() => setShowHelp(false)}
+        />
 
 
       <Autocomplete
@@ -313,7 +284,6 @@ window.dig = dog
         value={selectedTemps}
         onChange={(event, v) => setSelectedTemps(expandAliases(v))}
         groupBy={option => option.mode}
-        // getOptionLabel={option => `${option.temps} (${option.mode})`.replaceAll('_', ' ')}
         getOptionLabel={option => formatTemps(option.mode, option.temps).replaceAll('_', ' ')}
         renderInput={(params) => <TextField {...params} label={locale({fr: "Modes et temps", en: "Moods and tenses"})} />}
         renderOption={(props, option) => {
