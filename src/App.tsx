@@ -29,6 +29,8 @@ import {
 
 import removeAccents from 'remove-accents'
 
+import VolumeUpIcon from '@mui/icons-material/VolumeUp'
+
 
 function expandAliases(values) {
   let expandedValues = new Set()
@@ -50,11 +52,14 @@ function Key({ children }) {
 
 import useMediaQuery from '@mui/material/useMediaQuery';
 
+function dog() {
+  return VERBES.map(v => removeAccents(v))
+}
 
 const formatTemps = (mode, temps) => mode == "indicatif" ? temps : `${mode} ${temps}`
 
 function App() {
-
+window.dig = dog
   const [currentConjugation, setCurrentConjugation] = useState({
     mode: "indicatif",
     temps: "présent",
@@ -326,6 +331,17 @@ function App() {
         groupBy={option => option.group == undefined ? locale({fr: "verbes individuels", en: "individual verbs"}) : null}
         getOptionLabel={verb => verb.infinitif ?? verb.group}
         renderInput={(params) => <TextField {...params} label={locale({fr: "Verbes", en: "Verbs"})} />}
+        renderOption={(props, option) => {
+          const {key, ...optionProps} = props
+          return <Box key={key} {...optionProps}>
+            <div style={{display: "block", width: "100%"}}>
+              <span>{option.infinitif ?? option.group}</span>
+              <span style={{float: "right"}}>
+                {option.hasAudio ? <VolumeUpIcon color="disabled"/> : null}
+              </span>
+            </div>
+          </Box>
+        }}
       />
 
 
