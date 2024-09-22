@@ -51,6 +51,8 @@ function Key({ children }) {
 import useMediaQuery from '@mui/material/useMediaQuery';
 
 
+const formatTemps = (mode, temps) => mode == "indicatif" ? temps : `${mode} ${temps}`
+
 function App() {
 
   const [currentConjugation, setCurrentConjugation] = useState({
@@ -236,22 +238,6 @@ function App() {
             })}
 
 
-       {/*   <h4>Voix synthétique pour la prononciation:</h4>
-          <Autocomplete
-            label="Voix"
-            value={voice}
-            options={availableVoices}
-            disableCloseOnSelect
-
-            onChange={(event, v) => {
-              setVoice(v)
-              if (v != null) speak(v.name, v)
-            }}
-            getOptionLabel={v => !v ? "Default" : `${v.lang} “${v.name}” ${v.voiceURI}`}
-            renderInput={(params) => <TextField {...params} label="Voix" />}
-          />
-          <p>Laisser vide pour la voix par défaut.</p>*/}
-
           <h4>{locale({fr: "Raccourcis clavier", en: "Keyboard shortcuts"})}</h4>
 
           <table id="keymap">
@@ -322,7 +308,8 @@ function App() {
         value={selectedTemps}
         onChange={(event, v) => setSelectedTemps(expandAliases(v))}
         groupBy={option => option.mode}
-        getOptionLabel={option => `${option.temps} (${option.mode})`.replaceAll('_', ' ')}
+        // getOptionLabel={option => `${option.temps} (${option.mode})`.replaceAll('_', ' ')}
+        getOptionLabel={option => formatTemps(option.mode, option.temps).replaceAll('_', ' ')}
         renderInput={(params) => <TextField {...params} label={locale({fr: "Modes et temps", en: "Moods and tenses"})} />}
         renderOption={(props, option) => {
           const {key, ...optionProps} = props
@@ -400,8 +387,8 @@ function App() {
       </Grid>
 
       <h3 style={{visibility: showParts ? 'visible' : 'hidden'}}>
-      « {currentConjugation.personne.pronom} + {currentConjugation.verbe} »
-      au {currentConjugation.temps} ({currentConjugation.mode})</h3>
+      {currentConjugation.personne.pronom} + {currentConjugation.verbe} ({formatTemps(currentConjugation.mode, currentConjugation.temps)})
+      </h3>
 
       <h2 id="conjugé" style={{visibility: showConjugé ? 'visible' : 'hidden'}}>{currentConjugation.conjugé}</h2>
 
