@@ -423,7 +423,7 @@ function App() {
             onChange={(event, value) => {
               setConjugéSwitch(value)
               setShowConjugé(value)
-              revealAnswer(false)
+              revealAnswer(value)
             }}
           />
         </Grid>
