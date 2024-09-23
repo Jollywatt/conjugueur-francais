@@ -34,13 +34,11 @@ h1 {
   pointer-events: none;
   color: transparent;
 }
-
-#conjugé-overlay .error {
-  color: red;
-}
-#conjugé-overlay .correct {
-/*  color: green;*/
+#conjugé-overlay.correct {
   text-shadow: 0 0 15px #0f0;
+}
+#conjugé-overlay span.error {
+  color: red;
 }
 
 #conjugé-overlay.incomplete::after {

@@ -126,7 +126,7 @@ function App() {
     setShowParts(partsSwitch)
     setShowConjugé(conjugéSwitch)
     setConjugéInput(conjugéSwitch ? conj.conjugé : '')
-
+    setShowHint(false)
     if (prononcerSwitch) prononcer(conj)
   }
 
@@ -144,7 +144,11 @@ function App() {
     setConjugéInput(shown ? currentConjugation.conjugé : '')
   }
 
-  const answerIsCorrect = () => conjugéInput == currentConjugation.conjugé
+  const normalizeForComparison = (x: string) => x.replace(/[‘’]/, "'").toLowerCase().normalize()
+
+  const answerIsCorrect = () => (
+    normalizeForComparison(conjugéInput) == normalizeForComparison(currentConjugation.conjugé)
+  )
 
   const theme = createTheme({
     colorSchemes: {
@@ -162,12 +166,13 @@ function App() {
     let elements = []
     let classes = []
 
-    if (conjugéInput == correct) {
-      elements.push(<span className="correct">{correct}</span>)
+    if (answerIsCorrect()) {
+      classes.push("correct")
+      elements.push(conjugéInput)
     } else {
       for (let i = 0; i < conjugéInput.length; i++) {
-        if (conjugéInput[i] == correct[i]) {
-          elements.push(correct[i])
+        if (normalizeForComparison(conjugéInput[i]) == normalizeForComparison(correct[i])) {
+          elements.push(conjugéInput[i])
         } else {
           elements.push(wrong(conjugéInput[i]))
         }
@@ -441,6 +446,7 @@ function App() {
                   prononcer()
                 }
               }
+              console.log(correct)
             } else if (event.key == ",") {
               setShowParts(!showParts)
               event.preventDefault()
