@@ -134,10 +134,9 @@ function App() {
   useEffect(() => randomButton(), [])
 
   useHotkeys('return', randomButton)
-  useHotkeys('space', () => prononcer())
+  useHotkeys('space,/,:', () => prononcer())
   useHotkeys('comma,p', () => setShowParts(!showParts))
-  useHotkeys('.,c', () => revealAnswer(!showConjugé))
-  // useHotkeys('.,c', () => setShowConjugé(!showConjugé))
+  useHotkeys('.,c,;', () => revealAnswer(!showConjugé))
 
 
   function revealAnswer(shown) {
@@ -336,7 +335,7 @@ function App() {
             <div style={{display: "block", width: "100%"}}>
               <span>{option.infinitif ?? option.group}</span>
               <span style={{float: "right"}}>
-                {option.hasAudio ? <VolumeUpIcon color="disabled"/> : null}
+                {option.hasAudio ? <VolumeUpIcon fontSize="small" color="disabled"/> : null}
               </span>
             </div>
           </Box>
@@ -417,24 +416,29 @@ function App() {
           onChange={(e, value) => setConjugéInput(e.target.value)}
           onKeyDown={(event) => {
             if (event.key == "Enter") {
-              if (answerIsCorrect() && showHint) {
-                setShowHint(false)
-                randomButton()
-              } else {
-                setShowHint(true)
+              const correct = answerIsCorrect()
+              setShowHint(true)
+              if (correct) {
+                if (showHint) { // hint already shown
+                  setShowHint(false)
+                  randomButton()
+                } else {
+                  prononcer()
+                }
               }
-            } else if (event.key == "/") {
-              prononcer()
-              event.preventDefault()
             } else if (event.key == ",") {
               setShowParts(!showParts)
               event.preventDefault()
-            } else if (event.key == ".") {
+            } else if (event.key == "." || event.key == ";") {
               revealAnswer(!showConjugé)
+              event.preventDefault()
+            } else if (event.key == "/" || event.key == ":") {
+              prononcer()
               event.preventDefault()
             } else {
               setShowHint(false)
             }
+            console.log(event)
           }}
         ></input>
       </div>
