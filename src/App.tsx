@@ -222,26 +222,41 @@ function App() {
             />🇬🇧</Typography>
 
             {locale({
-              fr: <p>
-                Les commutateurs à bascule contrôlent ce qui est affiché lorsqu'une nouvelle phrase est choisie.
-                Par exemple, en activant uniquement « parties », vous pouvez pratiquer la conjugaison des verbes,
-                et en activant uniquement « discours », vous pouvez apprendre à quoi ressemblent les différents temps.              </p>,
-              en: <p>
-                The toggle switches control what is shown when a new phrase is chosen.
-                For example, by selecting only the "show parts" switch, you can practice verb conjugations,
-                and by selecting only the "speak" switch, you can learn how the different tenses sound.
-              </p>,
+              fr: <>
+                <h4>Instructions</h4>
+                <p>
+                  Le bouton ‹ Phrase Aléatoire › choisit un verbe français conjugué à l'une des personnes grammaticales, modes, et temps sélectionnés dans les menus.
+                </p>
+                <p>
+                  Les trois boutons vous permettent d'entendre la phrase, de voir le verbe et le temps, ou de révéler la phrase conjuguée.
+                </p>
+                <p>
+                  Les trois interrupteurs permettent de contrôler ce qui est affiché immédiatement.
+                  Différentes combinaisons permettent différents modes de pratique. Par exemple :
+                </p>
+                <ul>
+                  <li>Avec ‹ Décomposer › activé et ‹ Conjuger › désactivé, vous pouvez vous entraîner à conjuguer en tapant dans la case et en appuyant sur <Key>entrée</Key> pour vérifier.</li>
+                  <li>Lorsque l'interrupteur ‹ Décomposer › est désactivé, vous pouvez vous entraîner à distinguer les temps à l'oreille (si ‹ Prononcer › est activé) ou à partir de la forme conjuguée (si ‹ Conjuger › est activé).</li>
+                </ul>
+              </>,
+              en: <>
+                <h4>Instructions</h4>
+                <p>
+                  The ‘Random Phrase’ button picks a French verb conjugated to one of the grammatical persons, moods, and tenses selected in the menus.
+                </p>
+                <p>
+                  The three buttons allow you to hear the phrase, see the verb and tense, or reveal the conjugated phrase.
+                </p>
+                <p>
+                  The three toggle switches control what is shown immediately.
+                  Different combinations allow for different modes of practice. For example:
+                </p>
+                <ul>
+                  <li>With ‘Show Parts’ enabled and ‘Show Conjugated’ disabled, you can practice conjugating by typing into the box and pressing <Key>return</Key> to check.</li>
+                  <li>When the ‘Show Parts’ switch is disabled, you can practice distinguishing the tenses by sound (if ‘Speak’ is enabled) or from the conjugated form (if ‘Show Conjugated’ is enabled).</li>
+                </ul>
+              </>
             })}
-
-            {locale({
-              fr: <p>
-                Les prononcés sont téléchargés sous forme de clips audio. Seuls les 50 premiers verbes ont de l’audio.
-              </p>,
-              en: <p>
-                Pronounciations are downloaded as audio clips. Only the top 50 verbs have audio.
-              </p>,
-            })}
-
 
           <h4>{locale({fr: "Raccourcis clavier", en: "Keyboard shortcuts"})}</h4>
 
@@ -257,7 +272,7 @@ function App() {
                   <td>Voir les parts</td>
                 </tr>
                 <tr>
-                  <td><Key>.</Key> ou <Key>c</Key></td>
+                  <td><Key>.</Key> ou <Key>;</Key> ou <Key>c</Key></td>
                   <td>Voir la phrase conjugé</td>
                 </tr>
                 <tr>
@@ -275,7 +290,7 @@ function App() {
                   <td>See components</td>
                 </tr>
                 <tr>
-                  <td><Key>.</Key> or <Key>c</Key></td>
+                  <td><Key>.</Key> or <Key>;</Key> or <Key>c</Key></td>
                   <td>See conjugated phrase</td>
                 </tr>
                 <tr>
@@ -302,23 +317,6 @@ function App() {
         renderInput={(params) => <TextField {...params} label={locale({fr: "Personnes grammaticales", en: "Grammatical person"})} />}
       />
 
-      <Autocomplete
-        multiple
-        disableCloseOnSelect
-        options={[
-          {label: locale({fr: "(sélectionner toutes)", en: "(select all)"}), expand: new Set(TEMPS)},
-          ...TEMPS,
-        ]}
-        value={selectedTemps}
-        onChange={(event, v) => setSelectedTemps(expandAliases(v))}
-        groupBy={option => option.mode}
-        getOptionLabel={option => formatTemps(option.mode, option.temps).replaceAll('_', ' ')}
-        renderInput={(params) => <TextField {...params} label={locale({fr: "Modes et temps", en: "Moods and tenses"})} />}
-        renderOption={(props, option) => {
-          const {key, ...optionProps} = props
-          return <Box key={key} {...optionProps}>{option.temps?.replaceAll('_', ' ') || option.label}</Box>
-        }}
-      />
 
       <Autocomplete
         multiple
@@ -342,6 +340,23 @@ function App() {
         }}
       />
 
+      <Autocomplete
+        multiple
+        disableCloseOnSelect
+        options={[
+          {label: locale({fr: "(sélectionner toutes)", en: "(select all)"}), expand: new Set(TEMPS)},
+          ...TEMPS,
+        ]}
+        value={selectedTemps}
+        onChange={(event, v) => setSelectedTemps(expandAliases(v))}
+        groupBy={option => option.mode}
+        getOptionLabel={option => formatTemps(option.mode, option.temps).replaceAll('_', ' ')}
+        renderInput={(params) => <TextField {...params} label={locale({fr: "Modes et temps", en: "Moods and tenses"})} />}
+        renderOption={(props, option) => {
+          const {key, ...optionProps} = props
+          return <Box key={key} {...optionProps}>{option.temps?.replaceAll('_', ' ') || option.label}</Box>
+        }}
+      />
 
       <Button
         variant="contained"
