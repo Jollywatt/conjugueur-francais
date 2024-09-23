@@ -78,15 +78,21 @@ function App() {
   const [conjugéOverlay, setConjugéOverlay] = useState<string>('x')
 
   function getSelectedVerbes() {
-    let all = new Set()
+    let set = new Set()
     for (const entry of selectedVerbes) {
       if (entry.infinitif !== undefined) {
-        all.add(entry.infinitif)
+        set.add(entry.infinitif)
       } else if (entry.verbes !== undefined) {
-        all = all.union(entry.verbes)
+        set = set.union(entry.verbes)
       }
     }
-    return all.size > 0 ? Array.from(all) : VERBES
+    if (set.size == 0) set = new Set(VERBES)
+    for (const entry of selectedVerbes) {
+      if (entry.only !== undefined) {
+        set = set.intersection(entry.only)
+      }
+    }
+    return set.size > 0 ? Array.from(set) : VERBES
   }
 
 
@@ -448,7 +454,7 @@ function App() {
                 if (showHint) { // hint already shown
                   setShowHint(false)
                   randomButton()
-                } else {
+                } else if (!prononcerSwitch) {
                   prononcer()
                 }
               }

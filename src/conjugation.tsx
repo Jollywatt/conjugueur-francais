@@ -57,8 +57,8 @@ export const VERBES_GROUPE_1 = VERBES.filter(v => VERBES_GROUPE_2.indexOf(v) < 0
 
 export const VERBE_MENU = [
 	{group: "Top 6", expand: new Set(VERBES.slice(0, 6).map(i => ({infinitif: i})))},
-	// {group: "Top 50", verbes: new Set(VERBES.slice(0, 50))},
-	{group: "Verbes avec audio (top 100)", verbes: new Set(VERBES.filter(i => VERBES_AVEC_AUDIO.indexOf(i) > 0))},
+	{group: "Top 30", verbes: new Set(VERBES.slice(0, 30))},
+	{group: "Seulement avec audio", only: new Set(VERBES.filter(i => VERBES_AVEC_AUDIO.indexOf(i) > 0))},
 	{group: "Toutes verbes", verbes: new Set(VERBES)},
 	{group: "1er groupe (-er)", verbes: new Set(VERBES_GROUPE_1)},
 	{group: "2e groupe (-ir)", verbes: new Set(VERBES_GROUPE_2)},
