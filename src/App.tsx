@@ -71,7 +71,10 @@ function App() {
 
   const [showParts, setShowParts] = useState<boolean>(false)
   const [showConjugé, setShowConjugé] = useState<boolean>(false)
+  const [showHint, setShowHint] = useState<boolean>(false)
 
+  const [conjugéInput, setConjugéInput] = useState<string>('x')
+  const [conjugéOverlay, setConjugéOverlay] = useState<string>('x')
 
   function getSelectedVerbes() {
     let all = new Set()
@@ -121,6 +124,7 @@ function App() {
 
     setShowParts(partsSwitch)
     setShowConjugé(conjugéSwitch)
+    setConjugéInput(conjugéSwitch ? conj.conjugé : '')
 
     if (prononcerSwitch) prononcer(conj)
   }
@@ -131,8 +135,16 @@ function App() {
   useHotkeys('return', randomButton)
   useHotkeys('space', () => prononcer())
   useHotkeys('comma,p', () => setShowParts(!showParts))
-  useHotkeys('.,c', () => setShowConjugé(!showConjugé))
+  useHotkeys('.,c', () => revealAnswer(!showConjugé))
+  // useHotkeys('.,c', () => setShowConjugé(!showConjugé))
 
+
+  function revealAnswer(shown) {
+    setShowConjugé(shown)
+    setConjugéInput(shown ? currentConjugation.conjugé : '')
+  }
+
+  const answerIsCorrect = () => conjugéInput == currentConjugation.conjugé
 
   const theme = createTheme({
     colorSchemes: {
@@ -233,6 +245,30 @@ function App() {
       </Paper>
     </Popover>
   </>
+
+  const wrong = (x) => <span className="error">{x}</span>
+
+  function ConjugéOverlay(props) {
+    const correct = currentConjugation.conjugé
+
+    let elements = []
+    let classes = []
+
+    if (conjugéInput == correct) {
+      elements.push(<span className="correct">{correct}</span>)
+    } else {
+      for (let i = 0; i < conjugéInput.length; i++) {
+        if (conjugéInput[i] == correct[i]) {
+          elements.push(correct[i])
+        } else {
+          elements.push(wrong(conjugéInput[i]))
+        }
+      }
+      if (correct.length > conjugéInput.length) classes.push("incomplete")
+    }
+
+    return <div id="conjugé-overlay" className={classes}>{elements}</div>
+  }
 
   return <ThemeProvider theme={theme}>
     <Stack spacing={3}>
@@ -358,7 +394,9 @@ function App() {
           <Button
             fullWidth
             variant="outlined"
-            onClick={() => setShowConjugé(true)}
+            onClick={() => {
+              revealAnswer(true)
+            }}
           >
             {locale({fr: "Conjuger", en: "Show conjugated"})}
           </Button>
@@ -367,6 +405,7 @@ function App() {
             onChange={(event, value) => {
               setConjugéSwitch(value)
               setShowConjugé(value)
+              revealAnswer(false)
             }}
           />
         </Grid>
@@ -376,7 +415,27 @@ function App() {
       {currentConjugation.personne.pronom} + {currentConjugation.verbe} ({formatTemps(currentConjugation.mode, currentConjugation.temps)})
       </h3>
 
-      <h2 id="conjugé" style={{visibility: showConjugé ? 'visible' : 'hidden'}}>{currentConjugation.conjugé}</h2>
+      <div id="conjugé">
+        {showHint ? <ConjugéOverlay/> : null}
+        <input
+          required
+          id="conjugé-input"
+          value={conjugéInput}
+          onChange={(e, value) => setConjugéInput(e.target.value)}
+          onKeyDown={(event) => {
+            if (event.key == "Enter") {
+              if (answerIsCorrect() && showHint) {
+                setShowHint(false)
+                randomButton()
+              } else {
+                setShowHint(true)
+              }
+            } else {
+              setShowHint(false)
+            }
+          }}
+        ></input>
+      </div>
 
     </Stack>
   </ThemeProvider>

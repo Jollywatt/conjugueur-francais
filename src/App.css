@@ -14,6 +14,44 @@ h1 {
 
 #conjugé {
   font: 35pt 'Snell Roundhand';
+  position: relative;
+}
+
+#conjugé-input {
+  font: inherit;
+  background: none;
+  padding: 0;
+  display: block;
+  width: 100%;
+  text-align: center;
+  appearance: none;
+  border: none;
+}
+
+#conjugé-overlay {
+  width: 100%;
+  position: absolute;
+  white-space: pre;
+  pointer-events: none;
+  color: transparent;
+}
+
+#conjugé-overlay .error {
+  color: red;
+}
+#conjugé-overlay .correct {
+/*  color: green;*/
+  text-shadow: 0 0 15px #0f0;
+}
+
+#conjugé-overlay.incomplete::after {
+  color: red;
+  position: absolute;
+  content: "...";
+}
+
+#conjugé-input:invalid {
+  border-bottom: 1pt dashed gray;
 }
 
 .key {
