@@ -155,98 +155,6 @@ function App() {
   const helpButtonRef = useRef()
   const [showHelp, setShowHelp] = useState<boolean>(false);
 
-  const HelpWindow = props => <>
-    <Popover
-      open={props.show}
-      anchorEl={props.helpButtonRef.current}
-      onClose={props.onClose}
-      anchorOrigin={{
-        vertical: 'bottom',
-        horizontal: 'center',
-      }}
-      transformOrigin={{
-        vertical: 'top',
-        horizontal: 'center',
-      }}
-    >
-      <Paper sx={{ p: 2 }}>
-
-        <Typography textAlign="center">🇫🇷<Switch
-            checked={UILanguage == "en"}
-            onChange={(event, value) => setUILanguage(value ? "en" : "fr")}
-            sx={{
-                filter: "saturate(0%)"
-            }}
-          />🇬🇧</Typography>
-
-          {locale({
-            fr: <p>
-              Les commutateurs à bascule contrôlent ce qui est affiché lorsqu'une nouvelle phrase est choisie.
-              Par exemple, en activant uniquement « parties », vous pouvez pratiquer la conjugaison des verbes,
-              et en activant uniquement « discours », vous pouvez apprendre à quoi ressemblent les différents temps.              </p>,
-            en: <p>
-              The toggle switches control what is shown when a new phrase is chosen.
-              For example, by selecting only the "show parts" switch, you can practice verb conjugations,
-              and by selecting only the "speak" switch, you can learn how the different tenses sound.
-            </p>,
-          })}
-
-          {locale({
-            fr: <p>
-              Les prononcés sont téléchargés sous forme de clips audio. Seuls les 50 premiers verbes ont de l’audio.
-            </p>,
-            en: <p>
-              Pronounciations are downloaded as audio clips. Only the top 50 verbs have audio.
-            </p>,
-          })}
-
-
-        <h4>{locale({fr: "Raccourcis clavier", en: "Keyboard shortcuts"})}</h4>
-
-        <table id="keymap">
-          {locale({
-            fr: <tbody>
-              <tr>
-                <td><Key>retour</Key></td>
-                <td>Choisir une autre exemple</td>
-              </tr>
-              <tr>
-                <td><Key>,</Key> ou <Key>p</Key></td>
-                <td>Voir les parts</td>
-              </tr>
-              <tr>
-                <td><Key>.</Key> ou <Key>c</Key></td>
-                <td>Voir la phrase conjugé</td>
-              </tr>
-              <tr>
-                <td><Key>espace</Key> ou <Key>/</Key></td>
-                <td>Prononcer la phrase conjugé</td>
-              </tr>
-            </tbody>,
-            en: <tbody>
-              <tr>
-                <td><Key>return</Key></td>
-                <td>Generate random example</td>
-              </tr>
-              <tr>
-                <td><Key>,</Key> or <Key>p</Key></td>
-                <td>See components</td>
-              </tr>
-              <tr>
-                <td><Key>.</Key> or <Key>c</Key></td>
-                <td>See conjugated phrase</td>
-              </tr>
-              <tr>
-                <td><Key>space</Key> or <Key>/</Key></td>
-                <td>Speak conjugated phrase</td>
-              </tr>
-            </tbody>,
-          })}
-        </table>
-      </Paper>
-    </Popover>
-  </>
-
   const wrong = (x) => <span className="error">{x}</span>
 
   function ConjugéOverlay(props) {
@@ -291,11 +199,95 @@ function App() {
         />🇬🇧</Typography>
       </div>
 
-      <HelpWindow
-        helpButtonRef={helpButtonRef}
-        show={showHelp}
+      <Popover
+        open={showHelp}
+        anchorEl={helpButtonRef.current}
         onClose={() => setShowHelp(false)}
-        />
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'center',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'center',
+        }}
+      >
+        <Paper sx={{ p: 2 }}>
+
+          <Typography textAlign="center">🇫🇷<Switch
+              checked={UILanguage == "en"}
+              onChange={(event, value) => setUILanguage(value ? "en" : "fr")}
+              sx={{
+                  filter: "saturate(0%)"
+              }}
+            />🇬🇧</Typography>
+
+            {locale({
+              fr: <p>
+                Les commutateurs à bascule contrôlent ce qui est affiché lorsqu'une nouvelle phrase est choisie.
+                Par exemple, en activant uniquement « parties », vous pouvez pratiquer la conjugaison des verbes,
+                et en activant uniquement « discours », vous pouvez apprendre à quoi ressemblent les différents temps.              </p>,
+              en: <p>
+                The toggle switches control what is shown when a new phrase is chosen.
+                For example, by selecting only the "show parts" switch, you can practice verb conjugations,
+                and by selecting only the "speak" switch, you can learn how the different tenses sound.
+              </p>,
+            })}
+
+            {locale({
+              fr: <p>
+                Les prononcés sont téléchargés sous forme de clips audio. Seuls les 50 premiers verbes ont de l’audio.
+              </p>,
+              en: <p>
+                Pronounciations are downloaded as audio clips. Only the top 50 verbs have audio.
+              </p>,
+            })}
+
+
+          <h4>{locale({fr: "Raccourcis clavier", en: "Keyboard shortcuts"})}</h4>
+
+          <table id="keymap">
+            {locale({
+              fr: <tbody>
+                <tr>
+                  <td><Key>retour</Key></td>
+                  <td>Choisir une autre exemple</td>
+                </tr>
+                <tr>
+                  <td><Key>,</Key> ou <Key>p</Key></td>
+                  <td>Voir les parts</td>
+                </tr>
+                <tr>
+                  <td><Key>.</Key> ou <Key>c</Key></td>
+                  <td>Voir la phrase conjugé</td>
+                </tr>
+                <tr>
+                  <td><Key>espace</Key> ou <Key>/</Key></td>
+                  <td>Prononcer la phrase conjugé</td>
+                </tr>
+              </tbody>,
+              en: <tbody>
+                <tr>
+                  <td><Key>return</Key></td>
+                  <td>Generate random example</td>
+                </tr>
+                <tr>
+                  <td><Key>,</Key> or <Key>p</Key></td>
+                  <td>See components</td>
+                </tr>
+                <tr>
+                  <td><Key>.</Key> or <Key>c</Key></td>
+                  <td>See conjugated phrase</td>
+                </tr>
+                <tr>
+                  <td><Key>space</Key> or <Key>/</Key></td>
+                  <td>Speak conjugated phrase</td>
+                </tr>
+              </tbody>,
+            })}
+          </table>
+        </Paper>
+      </Popover>
 
 
       <Autocomplete
