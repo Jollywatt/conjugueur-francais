@@ -94,7 +94,7 @@ export function conjugate({personne, temps, verbe}) {
 
 	// ensure genre agreement for verbs with être-auxilliary conjugated with elle(s)
 	if (personne.pronom.startsWith("elle")) {
-		const être = /\b(est|sont|était|étaient|sera|seront|soit|soient)\b/
+		const être = /\b(est|sont|était|étaient|sera|seront|soit|soient) /
 		if (être.test(conj)) conj = conj.replace(/(s?)$/, "e$1")
 	}
 
