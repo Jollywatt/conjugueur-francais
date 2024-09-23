@@ -1,19 +1,18 @@
 #root {
-/*  width: 1000px;*/
   margin: 0 auto;
   padding: 1.5rem;
   text-align: center;
+
+  --fancy-font: 'Snell Roundhand';
 }
 
-
-
 h1 {
-  font-family: 'Snell Roundhand';
+  font-family: var(--fancy-font);
   font-weight: bold;
 }
 
 #conjugé {
-  font: 35pt 'Snell Roundhand';
+  font: 35pt var(--fancy-font);
   position: relative;
 }
 

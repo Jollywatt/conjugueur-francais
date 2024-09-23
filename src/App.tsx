@@ -58,6 +58,7 @@ function App() {
   })
 
   const [UILanguage, setUILanguage] = useState("fr")
+  const [UIFont, setUIFont] = useState(false)
   const locale = (versions) => versions[UILanguage]
 
 
@@ -218,7 +219,7 @@ function App() {
                 <td>Voir la phrase conjugé</td>
               </tr>
               <tr>
-                <td><Key>espace</Key></td>
+                <td><Key>espace</Key> ou <Key>/</Key></td>
                 <td>Prononcer la phrase conjugé</td>
               </tr>
             </tbody>,
@@ -236,7 +237,7 @@ function App() {
                 <td>See conjugated phrase</td>
               </tr>
               <tr>
-                <td><Key>space</Key></td>
+                <td><Key>space</Key> or <Key>/</Key></td>
                 <td>Speak conjugated phrase</td>
               </tr>
             </tbody>,
@@ -271,7 +272,7 @@ function App() {
   }
 
   return <ThemeProvider theme={theme}>
-    <Stack spacing={3}>
+    <Stack spacing={3} id={"app-body"} className={UIFont ? "fancy" : null}>
 
       <h1>{locale({fr: "Conjugueur Français", en: "French conjugator"})}</h1>
 
@@ -430,6 +431,15 @@ function App() {
               } else {
                 setShowHint(true)
               }
+            } else if (event.key == "/") {
+              prononcer()
+              event.preventDefault()
+            } else if (event.key == ",") {
+              setShowParts(!showParts)
+              event.preventDefault()
+            } else if (event.key == ".") {
+              revealAnswer(!showConjugé)
+              event.preventDefault()
             } else {
               setShowHint(false)
             }
