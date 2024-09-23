@@ -112,7 +112,12 @@ function App() {
 
   function randomButton() {
     const parts = chooseRandom(getSampleSpace())
+    if (parts.verbe == "falloir") {
+      parts.personne = PERSONNES[2]
+    }
     const conjugé = conjugate(parts)
+    console.log(conjugé)
+
 
     const conj = {
       mode: parts.temps.mode,

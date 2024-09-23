@@ -41876,50 +41876,120 @@
   "falloir": {
     "indicatif": {
       "présent": [
-        "il faut"
+        null,
+        null,
+        "il faut",
+        null,
+        null,
+        null
       ],
       "passé_composé": [
-        "il a fallu"
+        null,
+        null,
+        "il a fallu",
+        null,
+        null,
+        null
       ],
       "imparfait": [
-        "il fallait"
+        null,
+        null,
+        "il fallait",
+        null,
+        null,
+        null
       ],
       "plus_que_parfait": [
-        "il avait fallu"
+        null,
+        null,
+        "il avait fallu",
+        null,
+        null,
+        null
       ],
       "futur_simple": [
-        "il faudra"
+        null,
+        null,
+        "il faudra",
+        null,
+        null,
+        null
       ],
       "passé_simple": [
-        "il fallut"
+        null,
+        null,
+        "il fallut",
+        null,
+        null,
+        null
       ],
       "futur_antérieur": [
-        "il aura fallu"
+        null,
+        null,
+        "il aura fallu",
+        null,
+        null,
+        null
       ],
       "passé_antérieur": [
-        "il eut fallu"
+        null,
+        null,
+        "il eut fallu",
+        null,
+        null,
+        null
       ]
     },
     "conditionnel": {
       "présent": [
-        "il faudrait"
+        null,
+        null,
+        "il faudrait",
+        null,
+        null,
+        null
       ],
       "passé": [
-        "il aurait fallu"
+        null,
+        null,
+        "il aurait fallu",
+        null,
+        null,
+        null
       ]
     },
     "subjonctif": {
       "présent": [
-        "qu'il faille"
+        null,
+        null,
+        "qu'il faille",
+        null,
+        null,
+        null
       ],
       "passé": [
-        "qu'il ait fallu"
+        null,
+        null,
+        "qu'il ait fallu",
+        null,
+        null,
+        null
       ],
       "imparfait": [
-        "qu'il fallût"
+        null,
+        null,
+        "qu'il fallût",
+        null,
+        null,
+        null
       ],
       "plus_que_parfait": [
-        "qu'il eût fallu"
+        null,
+        null,
+        "qu'il eût fallu",
+        null,
+        null,
+        null
       ]
     },
     "imperatif": {
