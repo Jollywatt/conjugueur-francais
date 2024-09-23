@@ -116,8 +116,6 @@ function App() {
       parts.personne = PERSONNES[2]
     }
     const conjugé = conjugate(parts)
-    console.log(conjugé)
-
 
     const conj = {
       mode: parts.temps.mode,
@@ -166,26 +164,29 @@ function App() {
   const wrong = (x) => <span className="error">{x}</span>
 
   function ConjugéOverlay(props) {
-    const correct = currentConjugation.conjugé
-
-    let elements = []
     let classes = []
-
+    let html
     if (answerIsCorrect()) {
+      html = conjugéInput
       classes.push("correct")
-      elements.push(conjugéInput)
     } else {
-      for (let i = 0; i < conjugéInput.length; i++) {
-        if (normalizeForComparison(conjugéInput[i]) == normalizeForComparison(correct[i])) {
-          elements.push(conjugéInput[i])
+      const correct = normalizeForComparison(currentConjugation.conjugé)
+      html = Array.from(conjugéInput).map((char, i) => {
+        if (normalizeForComparison(char) == correct[i]) {
+          return char
         } else {
-          elements.push(wrong(conjugéInput[i]))
+          return `<span class="incorrect">${char}</span>`
         }
-      }
+      }).join('')
+
       if (correct.length > conjugéInput.length) classes.push("incomplete")
     }
 
-    return <div id="conjugé-overlay" className={classes}>{elements}</div>
+    return <div
+      id="conjugé-overlay"
+      className={classes}
+      dangerouslySetInnerHTML={{__html: html}}
+    />
   }
 
   return <ThemeProvider theme={theme}>
@@ -451,7 +452,6 @@ function App() {
                   prononcer()
                 }
               }
-              console.log(correct)
             } else if (event.key == ",") {
               setShowParts(!showParts)
               event.preventDefault()
@@ -464,7 +464,6 @@ function App() {
             } else {
               setShowHint(false)
             }
-            console.log(event)
           }}
         ></input>
       </div>

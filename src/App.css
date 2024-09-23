@@ -37,8 +37,10 @@ h1 {
 #conjugé-overlay.correct {
   text-shadow: 0 0 15px #0f0;
 }
-#conjugé-overlay span.error {
+#conjugé-overlay span.incorrect {
   color: red;
+  text-decoration: underline;
+  text-decoration-thickness: 1pt;
 }
 
 #conjugé-overlay.incomplete::after {
