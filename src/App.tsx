@@ -15,7 +15,7 @@ import { useHotkeys } from 'react-hotkeys-hook'
 import removeAccents from 'remove-accents'
 import useMediaQuery from '@mui/material/useMediaQuery';
 import VolumeUpIcon from '@mui/icons-material/VolumeUp'
-import { ThemeProvider, createTheme, useColorScheme } from '@mui/material/styles';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
 
 // polyfill for Set.prototype.union for older Safari
 import 'core-js/actual/set'
@@ -58,7 +58,6 @@ function App() {
   })
 
   const [UILanguage, setUILanguage] = useState("fr")
-  const [UIFont, setUIFont] = useState(false)
   const locale = (versions) => versions[UILanguage]
 
 
@@ -75,7 +74,6 @@ function App() {
   const [showHint, setShowHint] = useState<boolean>(false)
 
   const [conjugéInput, setConjugéInput] = useState<string>('x')
-  const [conjugéOverlay, setConjugéOverlay] = useState<string>('x')
 
   function getSelectedVerbes() {
     let set = new Set()
@@ -167,10 +165,8 @@ function App() {
   const helpButtonRef = useRef()
   const [showHelp, setShowHelp] = useState<boolean>(false);
 
-  const wrong = (x) => <span className="error">{x}</span>
-
-  function ConjugéOverlay(props) {
-    let classes = []
+  function ConjugéOverlay() {
+    const classes = []
     let html
     if (answerIsCorrect()) {
       html = conjugéInput
@@ -203,7 +199,7 @@ function App() {
       <div>
         <Button
           ref={helpButtonRef}
-          onClick={e => setShowHelp(true)}>
+          onClick={() => setShowHelp(true)}>
           {locale({fr: "Aide", en: "Help"})}
         </Button>
         <Typography>🇫🇷<Switch
@@ -242,7 +238,7 @@ function App() {
               fr: <>
                 <h4>Instructions</h4>
                 <p>
-                  Le bouton ‹ Phrase Aléatoire › choisit un verbe français conjugué à l'une des personnes grammaticales, modes, et temps sélectionnés dans les menus.
+                  Le bouton ‹&nbsp;Phrase Aléatoire&nbsp;› choisit un verbe français conjugué à l'une des personnes grammaticales, modes, et temps sélectionnés dans les menus.
                 </p>
                 <p>
                   Les trois boutons vous permettent d'entendre la phrase, de voir le verbe et le temps, ou de révéler la phrase conjuguée.
@@ -252,8 +248,8 @@ function App() {
                   Différentes combinaisons permettent différents modes de pratique. Par exemple :
                 </p>
                 <ul>
-                  <li>Avec ‹ Décomposer › activé et ‹ Conjuger › désactivé, vous pouvez vous entraîner à conjuguer en tapant dans la case et en appuyant sur <Key>entrée</Key> pour vérifier.</li>
-                  <li>Lorsque l'interrupteur ‹ Décomposer › est désactivé, vous pouvez vous entraîner à distinguer les temps à l'oreille (si ‹ Prononcer › est activé) ou à partir de la forme conjuguée (si ‹ Conjuger › est activé).</li>
+                  <li>Avec ‹&nbsp;Décomposer&nbsp;› activé et ‹&nbsp;Conjuger&nbsp;› désactivé, vous pouvez vous entraîner à conjuguer en tapant dans la case et en appuyant sur <Key>entrée</Key> pour vérifier.</li>
+                  <li>Lorsque l'interrupteur ‹&nbsp;Décomposer&nbsp;› est désactivé, vous pouvez vous entraîner à distinguer les temps à l'oreille (si ‹&nbsp;Prononcer&nbsp;› est activé) ou à partir de la forme conjuguée (si ‹&nbsp;Conjuger&nbsp;› est activé).</li>
                 </ul>
               </>,
               en: <>
@@ -340,7 +336,7 @@ function App() {
         disableCloseOnSelect
         options={VERBE_MENU}
         value={selectedVerbes}
-        onChange={(event, v) => setSelectedVerbes(expandAliases(v))}
+        onChange={(event, value) => setSelectedVerbes(expandAliases(value))}
         groupBy={option => option.group == undefined ? locale({fr: "verbes individuels", en: "individual verbs"}) : null}
         getOptionLabel={verb => verb.infinitif ?? verb.group}
         renderInput={(params) => <TextField {...params} label={locale({fr: "Verbes", en: "Verbs"})} />}
@@ -445,7 +441,7 @@ function App() {
           required
           id="conjugé-input"
           value={conjugéInput}
-          onChange={(e, value) => setConjugéInput(e.target.value)}
+          onChange={(event) => setConjugéInput(event.target.value)}
           onKeyDown={(event) => {
             if (event.key == "Enter") {
               const correct = answerIsCorrect()
