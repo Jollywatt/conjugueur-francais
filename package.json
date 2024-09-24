@@ -18,11 +18,13 @@
     "@emotion/styled": "^11.13.0",
     "@mui/icons-material": "^6.1.1",
     "@mui/material": "^6.1.0",
+    "@vituum/vite-plugin-postcss": "^1.1.0",
     "core-js": "^3.38.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-hotkeys-hook": "^4.5.1",
-    "remove-accents": "^0.5.0"
+    "remove-accents": "^0.5.0",
+    "sugarss": "^4.0.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.9.0",
@@ -38,5 +40,12 @@
     "typescript-eslint": "^8.0.1",
     "vite": "^5.4.1",
     "vitest": "^2.1.1"
+  },
+  "postcss": {
+    "parser": "sugarss",
+    "map": false,
+    "plugins": {
+      "postcss-plugin": {}
+    }
   }
 }

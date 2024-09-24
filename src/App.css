@@ -37,10 +37,80 @@ h1 {
 #conjugé-overlay.correct {
   text-shadow: 0 0 15px #0f0;
 }
-#conjugé-overlay span.incorrect {
-  color: red;
-  text-decoration: underline;
-  text-decoration-thickness: 1pt;
+#conjugé-overlay {
+
+  span.delete {
+    color: red;
+    text-decoration: line-through;
+    text-decoration-thickness: 1pt;
+  }
+
+  .swap {
+    color: red;
+    position: relative;
+    &:after {
+      font-family: 'Comic Sans MS';
+      color: red;
+      content: attr(annotation);
+      position: absolute;
+      font-size: 0.4em;
+      left: 40%;
+      top: -0.4em;
+      text-align: center;
+    }
+  }
+
+  .insert {
+    position: relative;
+    &:before {
+      font-family: 'Comic Sans MS';
+      color: red;
+      content: attr(annotation);
+      position: absolute;
+      font-size: 0.4em;
+      top: -0.4em;
+      left: -0.3em;
+      text-align: center;
+    }
+
+    &:after {
+      content: "^";
+      color: red;
+      position: absolute;
+      font-size: 0.6em;
+      left: -0.5em;
+      top: 1.1em;
+    }
+  }
+
+  span.missing {
+
+    width: 1px;
+    margin-right: -1px;
+    display: inline-block;
+
+    color: red;
+      color: red;
+      position: relative;
+      left: -.4em;
+      bottom: 0.6em;
+      font-size: 0.8em;
+
+    &:before {
+      content: "^";
+            position: relative;
+      bottom: -1.4em;
+      font-size: 0.8em;
+
+    }
+  }
+
+  span.tail:after {
+    color: red;
+    position: absolute;
+    content: "...";
+  }
+
 }
 
 #conjugé-overlay.incomplete::after {

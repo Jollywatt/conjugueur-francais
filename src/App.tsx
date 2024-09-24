@@ -28,6 +28,7 @@ import {
   chooseRandom,
   conjugate,
 } from './conjugation.tsx'
+import { formatSpellcheck } from "./spellcheck.jsx"
 
 import './App.css'
 
@@ -166,33 +167,21 @@ function App() {
   const [showHelp, setShowHelp] = useState<boolean>(false);
 
   function ConjugéOverlay() {
-    const classes = []
-    let html
     if (answerIsCorrect()) {
-      html = conjugéInput
-      classes.push("correct")
-    } else {
-      const correct = normalizeForComparison(currentConjugation.conjugé)
-      html = Array.from(conjugéInput).map((char, i) => {
-        if (normalizeForComparison(char) == correct[i]) {
-          return char
-        } else {
-          return `<span class="incorrect">${char}</span>`
-        }
-      }).join('')
-
-      if (correct.length > conjugéInput.length) classes.push("incomplete")
+      return <div id="conjugé-overlay" className="correct">{conjugéInput}</div>
     }
+
+    const correct = normalizeForComparison(currentConjugation.conjugé)
+    const html = formatSpellcheck(conjugéInput, correct)
 
     return <div
       id="conjugé-overlay"
-      className={classes}
       dangerouslySetInnerHTML={{__html: html}}
     />
   }
 
   return <ThemeProvider theme={theme}>
-    <Stack spacing={3} id={"app-body"} className={UIFont ? "fancy" : null}>
+    <Stack spacing={3}>
 
       <h1>{locale({fr: "Conjugueur Français", en: "French conjugator"})}</h1>
 
