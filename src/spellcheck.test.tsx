@@ -58,14 +58,45 @@ describe('composite edits', () => {
       ],
     )
   })
-  test('substitution with insertion', () => {
+  test('size 1-to-2 substitution', () => {
     assert.deepEqual(
       comptuteStringEdits("abc", "aXYc"),
       [
         {correct: 'a'},
-        {swap: 'b', with: 'X'},
-        {insert: 'Y'},
+        {swap: 'b', with: 'XY'},
         {correct: 'c'},
+      ],
+    )
+  })
+  test('size 3-to-2 substitution', () => {
+    assert.deepEqual(
+      comptuteStringEdits("aXYZc", "abc"),
+      [
+        {correct: 'a'},
+        {swap: 'XYZ', with: 'b'},
+        {correct: 'c'},
+      ],
+    )
+  })
+  test('size 2-to-2 substitution', () => {
+    assert.deepEqual(
+      comptuteStringEdits("aXYd", "abcd"),
+      [
+        {correct: 'a'},
+        {swap: 'XY', with: 'bc'},
+        {correct: 'd'},
+      ],
+    )
+  })
+  test('size 3-to-2 substitution', () => {
+    assert.deepEqual(
+      comptuteStringEdits("acXd", "abcd"),
+      [
+        {correct: 'a'},
+        {insert: 'b'},
+        {correct: 'c'},
+        {delete: 'X'},
+        {correct: 'd'},
       ],
     )
   })

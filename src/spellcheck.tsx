@@ -38,19 +38,43 @@ export function comptuteStringEdits(a: string, b: string) {
 	const steps = []
 
 	while (i + j > 0) {
-		if (false) {
-		} else if (d[i][j-1] < d[i][j]) {
+		if (d[i][j-1] < d[i][j]) {
+			// insertion operation
 			j -= 1
 			pushOrExtendLast(steps, 'insert', b[j])
 		} else if (d[i-1][j] < d[i][j]) {
+			// deletion operation
 			i -= 1
 			pushOrExtendLast(steps, 'delete', a[i])
-
 		} else if (d[i-1][j-1] < d[i][j]) {
+			// substitution operation
 			i -= 1
 			j -= 1
-			steps.push({swap: a[i], with: b[j]})
+			const lasti = steps.length - 1
+			if (steps[lasti]?.insert !== undefined) {
+				// merge following insertion with current substitution
+				steps.splice(lasti, 1, {
+					swap: a[i],
+					with: b[j] + steps[lasti].insert,
+				})
+			} else if (steps[lasti]?.delete !== undefined) {
+				// merge following deletion with current substitution
+				steps.splice(lasti, 1, {
+					swap: a[i] + steps[lasti].delete,
+					with: b[j]
+				})
+			} else if (steps[lasti]?.swap !== undefined) {
+				// merge with following substitution
+				steps.splice(lasti, 1, {
+					swap: a[i] + steps[lasti].swap,
+					with: b[j] + steps[lasti].with,
+				})
+			} else {
+				// add new substitution
+				steps.push({swap: a[i], with: b[j]})
+			}
 		} else {
+			// no operation (character is correct)
 			i -= 1
 			j -= 1
 			pushOrExtendLast(steps, 'correct', a[i])
