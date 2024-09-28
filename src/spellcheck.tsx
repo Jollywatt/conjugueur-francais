@@ -1,4 +1,4 @@
-export function computeWagnerFischerMatrix(a: string, b: string) {
+function computeWagnerFischerMatrix(a: string, b: string) {
 
 	const d = Array(a.length + 1).fill().map(i => Array(b.length + 1).fill(0))
 
